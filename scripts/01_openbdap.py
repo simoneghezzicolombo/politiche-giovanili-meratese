@@ -139,9 +139,16 @@ def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str | None]]:
 
     if cols.get("tipo_ente"):
         tipo = df[cols["tipo_ente"]].map(norm_text)
-        comune_mask = tipo.str.contains("comun", na=False)
-        if comune_mask.any():
-            df = df.loc[comune_mask].copy()
+        # Gli ZIP FET regionali includono anche Unioni di Comuni e Comunità
+        # montane. Se la categoria esatta "Comune" è presente, usiamo solo
+        # quella e non un generico contains("comun").
+        exact_mask = tipo.eq("comune")
+        if exact_mask.any():
+            df = df.loc[exact_mask].copy()
+        else:
+            fallback_mask = tipo.str.contains(r"\bcomune\b", regex=True, na=False)
+            if fallback_mask.any():
+                df = df.loc[fallback_mask].copy()
 
     df["_comune_key"] = df[cols["comune"]].map(canonical_municipality)
     df["_comune_label"] = df[cols["comune"]].astype(str).str.strip()
@@ -210,7 +217,7 @@ def main() -> None:
     out = aggregate(prepared)
     if len(out) < 1000:
         raise SystemExit(
-            f"Controllo di sicurezza fallito: trovati solo {len(out)} Comuni/enti comunali nel prospetto."
+            f"Controllo di sicurezza fallito: trovati solo {len(out)} Comuni nel prospetto."
         )
 
     path = ensure_parent(args.output)
