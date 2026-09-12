@@ -6,156 +6,30 @@ on:
   workflow_dispatch:
 
 jobs:
-  istat-all:
+  openbdap-target:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download and validate ISTAT 2024 population
+      - name: Fetch exact OpenBDAP Analizza client
         run: |
           python - <<'PY'
-          import urllib.request, urllib.error, pathlib, csv, io
-
-          municipalities = {
-            '097002':'Airuno','097005':'Barzago','097006':'Barzanò','097010':'Brivio',
-            '097012':'Calco','097016':'Casatenovo','097017':'Cassago Brianza',
-            '097020':'Cernusco Lombardone','097028':'Cremella','097039':'Imbersago',
-            '097092':'La Valletta Brianza','097044':'Lomagna','097048':'Merate',
-            '097049':'Missaglia','097053':'Montevecchia','097054':'Monticello Brianza',
-            '097058':'Olgiate Molgora','097061':'Osnago','097062':"Paderno d'Adda",
-            '097071':'Robbiate','097074':'Santa Maria Hoè','097076':'Sirtori',
-            '097091':'Verderio','097090':'Viganò'
-          }
-          areas='+'.join(municipalities)
-          ages='+'.join([f'Y{i}' for i in range(15,30)]+['TOTAL'])
-          key=f'A.{areas}.JAN.9.{ages}.99'
-          url=f'https://esploradati.istat.it/SDMXWS/rest/data/IT1,22_289_DF_DCIS_POPRES1_24,1.0/{key}'
-          req=urllib.request.Request(url, headers={
-            'Accept':'application/vnd.sdmx.data+csv;version=1.0.0',
-            'User-Agent':'Mozilla/5.0'
-          })
-          try:
-            with urllib.request.urlopen(req, timeout=300) as r:
-              data=r.read(); status=r.status; ctype=r.headers.get('content-type')
-          except urllib.error.HTTPError as e:
-            data=e.read(); status=e.code; ctype=e.headers.get('content-type')
-          print('ISTAT status', status, ctype, 'bytes', len(data))
-          if status >= 400:
-            print(data[:1000]); raise SystemExit(status)
-
-          outdir=pathlib.Path('acquisition_output'); outdir.mkdir(exist_ok=True)
-          (outdir/'istat_sdmx_raw.csv').write_bytes(data)
-          text=data.decode('utf-8-sig')
-          rows=list(csv.DictReader(io.StringIO(text)))
-          rows=[r for r in rows if r['TIME_PERIOD']=='2024']
-
-          by_area={}
-          for r in rows:
-            by_area.setdefault(r['REF_AREA'], {})[r['AGE']]=int(float(r['OBS_VALUE']))
-
-          expected_ages={f'Y{i}' for i in range(15,30)}|{'TOTAL'}
-          missing=set(municipalities)-set(by_area)
-          extra=set(by_area)-set(municipalities)
-          if missing or extra:
-            raise SystemExit(f'Coverage error missing={missing} extra={extra}')
-
-          clean=[]
-          for code,name in municipalities.items():
-            vals=by_area[code]
-            if set(vals)!=expected_ages:
-              raise SystemExit(f'{name}: age coverage mismatch {set(vals)^expected_ages}')
-            total=vals['TOTAL']
-            youth=sum(vals[f'Y{i}'] for i in range(15,30))
-            if youth<=0 or total<=0 or youth>=total:
-              raise SystemExit(f'{name}: implausible total={total} youth={youth}')
-            clean.append({
-              'comune':name,
-              'codice_istat':code,
-              'pop_totale':total,
-              'pop_15_29':youth,
-              'pop_data_riferimento':'2024-01-01',
-              'fonte':'ISTAT EsploraDati SDMX, 22_289_DF_DCIS_POPRES1_24',
-            })
-
-          path=outdir/'istat_population_2024_meratese.csv'
-          with path.open('w',newline='',encoding='utf-8') as f:
-            w=csv.DictWriter(f,fieldnames=list(clean[0])); w.writeheader(); w.writerows(clean)
-          print(f'Validated {len(clean)} municipalities')
-          print('comune,codice_istat,pop_totale,pop_15_29')
-          for r in clean:
-            print(f"{r['comune']},{r['codice_istat']},{r['pop_totale']},{r['pop_15_29']}")
+          import urllib.request, pathlib, re
+          out=pathlib.Path('openbdap_target'); out.mkdir(exist_ok=True)
+          url='https://openbdap.rgs.mef.gov.it/Content/js/fet_analizza.js?v=639196472800000000'
+          req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(req,timeout=180) as r:
+            data=r.read()
+          text=data.decode('utf-8-sig',errors='replace')
+          (out/'fet_analizza.js').write_text(text,encoding='utf-8')
+          print(text)
+          print('\n--- API-like strings ---')
+          for x in sorted(set(re.findall(r'[A-Za-z0-9_./?=&+:-]*(?:GetFET|FETDocuments|api/fet|document)[A-Za-z0-9_./?=&+:-]*',text,re.I))):
+            print(x)
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: istat-2024-meratese
-          path: acquisition_output/
-
-  openbdap-discovery:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Inspect public OpenBDAP FET client endpoints
-        run: |
-          python - <<'PY'
-          import urllib.request, urllib.parse, pathlib, re
-          from html.parser import HTMLParser
-
-          base='https://openbdap.rgs.mef.gov.it'
-          page=base+'/it/FET/Analizza'
-          out=pathlib.Path('openbdap_probe'); out.mkdir(exist_ok=True)
-          def get(url):
-            req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
-            with urllib.request.urlopen(req,timeout=180) as r:
-              return r.read(), r.status, r.headers.get('content-type')
-          data,status,ctype=get(page)
-          (out/'analizza.html').write_bytes(data)
-          text=data.decode('utf-8',errors='replace')
-          print('Analizza',status,ctype,'bytes',len(data))
-
-          class P(HTMLParser):
-            def __init__(self): super().__init__(); self.scripts=[]
-            def handle_starttag(self,tag,attrs):
-              if tag.lower()=='script':
-                d=dict(attrs)
-                if d.get('src'): self.scripts.append(d['src'])
-          p=P(); p.feed(text)
-          print('script count',len(p.scripts))
-          findings=[]
-          patterns=[r'/api/api/fet/[A-Za-z0-9_./?=&-]+',r'\bdata_FET_[A-Za-z0-9_]+\b',r'\b[A-Za-z0-9_]*(?:download|scarica|rendiconto|sdb)[A-Za-z0-9_]*\b']
-          for src in p.scripts:
-            url=urllib.parse.urljoin(page,src)
-            if not url.startswith(base): continue
-            try:
-              js,st,ct=get(url)
-            except Exception as e:
-              findings.append(f'ERR {url} {e!r}'); continue
-            if len(js)>8_000_000: continue
-            s=js.decode('utf-8',errors='replace')
-            hits=[]
-            for pat in patterns:
-              hits.extend(re.findall(pat,s,flags=re.I))
-            low=s.lower()
-            if hits or 'openbdap' in low and ('fet' in low or 'rendiconto' in low):
-              findings.append(f'FILE {url} bytes={len(js)}')
-              findings.extend('  '+h for h in sorted(set(hits))[:200])
-              # context around API/FET and rendiconto strings
-              for needle in ['api/api/fet','data_FET_','rendiconto','sdb','download','scarica']:
-                pos=0; count=0
-                while count<12:
-                  pos=low.find(needle.lower(),pos)
-                  if pos<0: break
-                  findings.append('  CTX '+s[max(0,pos-180):pos+360].replace('\n',' ')[:540])
-                  pos+=len(needle); count+=1
-          (out/'findings.txt').write_text('\n'.join(findings),encoding='utf-8')
-          print('\n'.join(findings[:500]))
-          PY
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: openbdap-fet-probe
-          path: openbdap_probe/
+          name: openbdap-target-js
+          path: openbdap_target/
