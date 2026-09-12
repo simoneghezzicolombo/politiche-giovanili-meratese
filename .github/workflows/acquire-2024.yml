@@ -1,0 +1,74 @@
+name: Acquire 2024 data
+
+on:
+  push:
+    branches: [acquire-2024]
+  workflow_dispatch:
+
+jobs:
+  probe-istat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe ISTAT SDMX structure
+        run: |
+          python - <<'PY'
+          import requests, xml.etree.ElementTree as ET, pathlib, re
+          base='https://esploradati.istat.it/SDMXWS/rest'
+          out=pathlib.Path('acquisition_probe'); out.mkdir(exist_ok=True)
+          headers={'Accept':'application/vnd.sdmx.structure+xml;version=2.1'}
+          urls={
+            'flow': f'{base}/dataflow/IT1/22_289_DF_DCIS_POPRES1_24/1.0?references=all',
+            'dsd': f'{base}/datastructure/IT1/DCIS_POPRES1/1.0?references=all',
+          }
+          lines=[]
+          for name,url in urls.items():
+            r=requests.get(url,headers=headers,timeout=180)
+            lines.append(f'{name}: {r.status_code} {r.headers.get("content-type")} bytes={len(r.content)} url={r.url}')
+            (out/f'{name}.xml').write_bytes(r.content)
+            if r.ok:
+              try:
+                root=ET.fromstring(r.content)
+                # show dimensions in order and codelist references
+                for el in root.iter():
+                  tag=el.tag.split('}')[-1]
+                  if tag in {'Dimension','TimeDimension'}:
+                    did=el.attrib.get('id')
+                    pos=el.attrib.get('position')
+                    enum=None
+                    for child in el.iter():
+                      ctag=child.tag.split('}')[-1]
+                      if ctag=='Ref' and child.attrib.get('class') in {'Codelist','Concept'}:
+                        enum=(child.attrib.get('id'), child.attrib.get('class'))
+                    lines.append(f'DIM {pos} {did} ref={enum}')
+                # print matching codelist codes/names for LC municipalities and dimension semantics
+                targets=['Airuno','Barzago','Barzan','Brivio','Calco','Casatenovo','Cassago','Cernusco Lombardone','Cremella','Imbersago','Valletta Brianza','Lomagna','Merate','Missaglia','Montevecchia','Monticello Brianza','Olgiate Molgora','Osnago','Paderno','Robbiate','Santa Maria','Sirtori','Verderio','Vigano']
+                for cl in root.iter():
+                  if cl.tag.split('}')[-1] != 'Codelist': continue
+                  cid=cl.attrib.get('id','')
+                  hits=[]
+                  for code in list(cl):
+                    if code.tag.split('}')[-1] != 'Code': continue
+                    code_id=code.attrib.get('id','')
+                    names=[]
+                    for n in code:
+                      if n.tag.split('}')[-1] in {'Name','Description'} and n.text:
+                        names.append(n.text.strip())
+                    text=' | '.join(names)
+                    if any(t.lower() in text.lower() for t in targets):
+                      hits.append((code_id,text))
+                  if hits:
+                    lines.append(f'CODELIST {cid} municipality hits={len(hits)}')
+                    lines += [f'  {a}\t{b}' for a,b in hits]
+              except Exception as e:
+                lines.append(f'XML parse error {name}: {e!r}')
+          (out/'probe.txt').write_text('\n'.join(lines),encoding='utf-8')
+          print('\n'.join(lines))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: istat-sdmx-probe
+          path: acquisition_probe/
