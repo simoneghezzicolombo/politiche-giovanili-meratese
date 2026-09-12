@@ -51,9 +51,11 @@ jobs:
       - name: Download and parse Istat population
         run: python scripts/02_istat_population.py --year 2024
 
-      - name: Build Meratese dataset, audit and figure
+      - name: Build Meratese and Lombardia datasets
         run: |
           python scripts/03_build_dataset.py
+          python scripts/03b_build_lombardia.py
+          python scripts/04_benchmark.py --input data/processed/lombardia_2024.csv
           python scripts/05_audit_low_values.py
           python scripts/06_figures.py
 
@@ -62,14 +64,19 @@ jobs:
         run: |
           python - <<'PY'
           import pandas as pd
-          p = 'data/processed/meratese_2024.csv'
-          df = pd.read_csv(p)
-          assert len(df) == 24, f'Attesi 24 Comuni, trovati {len(df)}'
-          assert df['comune'].nunique() == 24, 'Nomi Comune duplicati'
-          assert df['dato_bilancio_mancante'].sum() == 0, 'Dati di bilancio mancanti'
-          assert df['dato_popolazione_mancante'].sum() == 0, 'Dati demografici mancanti'
-          assert (df['pop_15_29'] > 0).all(), 'Popolazione 15-29 non valida'
-          print(df[['comune','m0602_corrente_impegni','m0602_capitale_impegni','pop_15_29','eur_m0602_per_giovane_15_29']].to_string(index=False))
+          m = pd.read_csv('data/processed/meratese_2024.csv')
+          l = pd.read_csv('data/processed/lombardia_2024.csv')
+          assert len(m) == 24, f'Attesi 24 Comuni, trovati {len(m)}'
+          assert m['comune'].nunique() == 24, 'Nomi Comune duplicati'
+          assert m['dato_bilancio_mancante'].sum() == 0, 'Dati di bilancio mancanti'
+          assert m['dato_popolazione_mancante'].sum() == 0, 'Dati demografici mancanti'
+          assert (m['pop_15_29'] > 0).all(), 'Popolazione 15-29 non valida'
+          assert 1450 <= len(l) <= 1550, f'Numero Comuni lombardi inatteso: {len(l)}'
+          assert l['pop_totale'].notna().sum() >= 1450, 'Troppi match Istat mancanti in Lombardia'
+          print('MERATESE')
+          print(m[['comune','m0602_corrente_impegni','m0602_capitale_impegni','pop_15_29','eur_m0602_per_giovane_15_29']].to_string(index=False))
+          print('\nLOMBARDIA')
+          print(f"Enti comunali: {len(l)}; zero M06-P02: {int(l['m0602_zero'].sum())} ({l['m0602_zero'].mean()*100:.1f}%)")
           PY
 
       - name: Record sources
@@ -118,6 +125,7 @@ jobs:
             data/processed/*.csv
             metadata/audit_queue_2024.csv
             metadata/source_log.csv
+            outputs/tables/*.csv
             outputs/figures/*.png
 
       - name: Commit validated derived outputs
@@ -126,10 +134,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/processed/meratese_2024.csv metadata/audit_queue_2024.csv metadata/source_log.csv outputs/figures/euro_per_giovane_2024.png
+          git add data/processed/meratese_2024.csv data/processed/lombardia_2024.csv metadata/audit_queue_2024.csv metadata/source_log.csv outputs/tables/benchmark_lombardia_2024.csv outputs/figures/euro_per_giovane_2024.png
           if git diff --cached --quiet; then
             echo 'Nessuna modifica da committare.'
           else
-            git commit -m 'Build official Meratese 2024 dataset'
+            git commit -m 'Build official Meratese and Lombardia 2024 data'
             git push origin main
           fi
