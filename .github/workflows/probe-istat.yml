@@ -1,0 +1,33 @@
+name: Probe Istat POSAS archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/probe-istat.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download and inspect POSAS archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip'
+          curl --fail --location --retry 3 --retry-delay 2 "$URL" -o /tmp/istat.zip
+          echo "Istat bytes: $(wc -c < /tmp/istat.zip)"
+          python - <<'PY'
+          import zipfile
+          p='/tmp/istat.zip'
+          with zipfile.ZipFile(p) as z:
+              print('ARCHIVE MEMBERS')
+              for i, info in enumerate(z.infolist()):
+                  print(i, info.filename, info.file_size)
+                  if i >= 199:
+                      break
+          PY
