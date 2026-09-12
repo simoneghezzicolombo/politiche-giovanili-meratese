@@ -49,4 +49,4 @@ jobs:
           git commit -m "Add verified youth spaces audit document"
           git push
 
-# Triggered after all verified base64 parts were staged.
+# Final trigger after verifying all required chunks exist on main.
