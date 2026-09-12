@@ -1,0 +1,29 @@
+name: Probe OpenBDAP FET
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/00_probe_openbdap.py'
+      - '.github/workflows/probe-openbdap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Probe public OpenBDAP endpoints
+        run: python scripts/00_probe_openbdap.py
+      - name: Upload probe result
+        uses: actions/upload-artifact@v4
+        with:
+          name: openbdap-probe
+          path: data/debug/openbdap_probe.json
+          if-no-files-found: error
