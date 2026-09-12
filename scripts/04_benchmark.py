@@ -25,17 +25,25 @@ def main() -> None:
     df["classe_demografica"] = pd.cut(df["pop_totale"], bins=BINS, labels=LABELS, include_lowest=True)
 
     metric = "eur_m0602_per_giovane_15_29"
-    grouped = df.groupby("classe_demografica", observed=True)[metric]
+    # Il benchmark della metrica usa solo Comuni per cui il bilancio è
+    # effettivamente disponibile. Gli zeri reali restano inclusi come zero.
+    metric_df = df[df[metric].notna()].copy()
+    grouped = metric_df.groupby("classe_demografica", observed=True)[metric]
     out = grouped.agg(
         n="count", media="mean", mediana="median",
         p25=lambda s: s.quantile(.25), p75=lambda s: s.quantile(.75),
         minimo="min", massimo="max",
     ).reset_index()
 
-    zeros = df.assign(zero=df["m0602_corrente_impegni"].fillna(0).eq(0)).groupby(
-        "classe_demografica", observed=True
-    )["zero"].mean().mul(100).reset_index(name="pct_comuni_zero")
-    out = out.merge(zeros, on="classe_demografica", how="left")
+    budget_df = df[df["m0602_corrente_impegni"].notna()].copy()
+    budget_df["zero"] = budget_df["m0602_corrente_impegni"].eq(0)
+    zeros = budget_df.groupby("classe_demografica", observed=True)["zero"].mean().mul(100).reset_index(
+        name="pct_comuni_zero"
+    )
+    coverage = budget_df.groupby("classe_demografica", observed=True).size().reset_index(name="n_bilanci_disponibili")
+    out = out.merge(zeros, on="classe_demografica", how="left").merge(
+        coverage, on="classe_demografica", how="left"
+    )
 
     path = ensure_parent(args.output)
     out.to_csv(path, index=False)
