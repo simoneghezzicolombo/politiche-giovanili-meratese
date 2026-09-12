@@ -1,25 +1,25 @@
-comune,provincia,ambito
-Airuno,LC,Merate
-Barzago,LC,Merate
-Barzanò,LC,Merate
-Brivio,LC,Merate
-Calco,LC,Merate
-Casatenovo,LC,Merate
-Cassago Brianza,LC,Merate
-Cernusco Lombardone,LC,Merate
-Cremella,LC,Merate
-Imbersago,LC,Merate
-La Valletta Brianza,LC,Merate
-Lomagna,LC,Merate
-Merate,LC,Merate
-Missaglia,LC,Merate
-Montevecchia,LC,Merate
-Monticello Brianza,LC,Merate
-Olgiate Molgora,LC,Merate
-Osnago,LC,Merate
-Paderno d’Adda,LC,Merate
-Robbiate,LC,Merate
-Santa Maria Hoè,LC,Merate
-Sirtori,LC,Merate
-Verderio,LC,Merate
-Viganò,LC,Merate
+comune,provincia,ambito,codice_istat
+Airuno,LC,Merate,097002
+Barzago,LC,Merate,097005
+Barzanò,LC,Merate,097006
+Brivio,LC,Merate,097010
+Calco,LC,Merate,097012
+Casatenovo,LC,Merate,097016
+Cassago Brianza,LC,Merate,097017
+Cernusco Lombardone,LC,Merate,097020
+Cremella,LC,Merate,097028
+Imbersago,LC,Merate,097039
+La Valletta Brianza,LC,Merate,097092
+Lomagna,LC,Merate,097044
+Merate,LC,Merate,097048
+Missaglia,LC,Merate,097049
+Montevecchia,LC,Merate,097053
+Monticello Brianza,LC,Merate,097054
+Olgiate Molgora,LC,Merate,097058
+Osnago,LC,Merate,097061
+Paderno d’Adda,LC,Merate,097062
+Robbiate,LC,Merate,097071
+Santa Maria Hoè,LC,Merate,097074
+Sirtori,LC,Merate,097076
+Verderio,LC,Merate,097091
+Viganò,LC,Merate,097090
