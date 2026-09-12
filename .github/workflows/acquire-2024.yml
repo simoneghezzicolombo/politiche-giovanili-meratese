@@ -6,45 +6,58 @@ on:
   workflow_dispatch:
 
 jobs:
-  openbdap-inspect:
+  build-2024:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download and inspect official Lombardia Rendiconto 2024 archive
+      - name: Install analysis dependencies
+        run: pip install -r requirements.txt
+      - name: Download official OpenBDAP Lombardia Rendiconto 2024
         run: |
           python - <<'PY'
-          import urllib.request, pathlib, zipfile, io, csv
-          out=pathlib.Path('openbdap_inspect'); out.mkdir(exist_ok=True)
+          import urllib.request, pathlib
           url='https://openbdap.rgs.mef.gov.it/Datasets_FET/Rendiconto/2024/2024_Rendiconto%20-%20Schemi%20di%20bilancio_LOMBARDIA.zip'
+          path=pathlib.Path('/tmp/openbdap_lombardia_2024.zip')
           req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'})
           with urllib.request.urlopen(req,timeout=600) as r:
-            data=r.read(); print('DOWNLOAD',r.status,r.headers.get('content-type'),'bytes',len(data),r.url)
-          (out/'lombardia_rendiconto_2024.zip').write_bytes(data)
-          z=zipfile.ZipFile(io.BytesIO(data))
-          infos=z.infolist()
-          print('ZIP files',len(infos))
-          for info in infos:
-            print(f'FILE\t{info.file_size}\t{info.filename}')
-          print('\n--- tabular headers / first rows ---')
-          for info in infos:
-            low=info.filename.lower()
-            if info.is_dir() or info.file_size==0: continue
-            if not low.endswith(('.csv','.txt','.tsv')): continue
-            raw=z.read(info)
-            enc='utf-8-sig'
-            try: text=raw.decode(enc)
-            except UnicodeDecodeError:
-              try: text=raw.decode('cp1252')
-              except Exception: continue
-            lines=text.splitlines()
-            print(f'\nTABLE {info.filename} lines={len(lines)} bytes={len(raw)}')
-            for line in lines[:4]: print(line[:2000])
+            with path.open('wb') as f:
+              while True:
+                chunk=r.read(1024*1024)
+                if not chunk: break
+                f.write(chunk)
+          print('Downloaded',path.stat().st_size,'bytes')
+          PY
+      - name: Parse OpenBDAP and build Meratese dataset
+        run: |
+          python scripts/01_openbdap.py \
+            --input /tmp/openbdap_lombardia_2024.zip \
+            --output data/interim/openbdap_2024_comuni.csv
+          python scripts/03_build_dataset.py \
+            --bilanci data/interim/openbdap_2024_comuni.csv \
+            --popolazione data/processed/popolazione_meratese_2024.csv \
+            --output acquisition_output/meratese_2024.csv
+      - name: Validate coverage and print results
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          p='acquisition_output/meratese_2024.csv'
+          df=pd.read_csv(p)
+          assert len(df)==24, len(df)
+          assert not df['dato_bilancio_mancante'].any(), df.loc[df['dato_bilancio_mancante'],'comune'].tolist()
+          assert not df['dato_popolazione_mancante'].any(), df.loc[df['dato_popolazione_mancante'],'comune'].tolist()
+          print('24/24 coverage validated')
+          cols=['comune','pop_15_29','m0602_corrente_impegni','m0602_capitale_impegni','eur_m0602_per_giovane_15_29','pct_spesa_corrente_m0602','m0602_zero']
+          print(df[cols].to_csv(index=False))
+          print('zero M06.02 current:', int(df['m0602_zero'].sum()))
+          print('non-zero:', int((~df['m0602_zero']).sum()))
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: openbdap-lombardia-2024-inspect
-          path: openbdap_inspect/
+          name: meratese-2024-built
+          path: |
+            acquisition_output/meratese_2024.csv
+            data/interim/openbdap_2024_comuni.csv
           retention-days: 7
