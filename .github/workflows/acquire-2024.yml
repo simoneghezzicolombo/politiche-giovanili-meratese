@@ -6,66 +6,44 @@ on:
   workflow_dispatch:
 
 jobs:
-  probe-istat:
+  istat-sample:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Probe ISTAT SDMX structure
+      - name: Query ISTAT sample for Merate
         run: |
           python - <<'PY'
-          import urllib.request, urllib.error, xml.etree.ElementTree as ET, pathlib
-          base='https://esploradati.istat.it/SDMXWS/rest'
+          import urllib.request, urllib.error, pathlib, csv, io
           out=pathlib.Path('acquisition_probe'); out.mkdir(exist_ok=True)
-          urls={
-            'flow': f'{base}/dataflow/IT1/22_289_DF_DCIS_POPRES1_24/1.0?references=all',
-            'dsd': f'{base}/datastructure/IT1/DCIS_POPRES1/1.0?references=all',
-          }
-          lines=[]
-          for name,url in urls.items():
-            req=urllib.request.Request(url, headers={'Accept':'application/vnd.sdmx.structure+xml;version=2.1','User-Agent':'Mozilla/5.0'})
-            try:
-              with urllib.request.urlopen(req, timeout=180) as r:
-                data=r.read(); status=r.status; ctype=r.headers.get('content-type')
-            except urllib.error.HTTPError as e:
-              data=e.read(); status=e.code; ctype=e.headers.get('content-type')
-            lines.append(f'{name}: {status} {ctype} bytes={len(data)} url={url}')
-            (out/f'{name}.xml').write_bytes(data)
-            if status < 400:
-              try:
-                root=ET.fromstring(data)
-                for el in root.iter():
-                  tag=el.tag.split('}')[-1]
-                  if tag in {'Dimension','TimeDimension'}:
-                    did=el.attrib.get('id'); pos=el.attrib.get('position'); refs=[]
-                    for child in el.iter():
-                      if child.tag.split('}')[-1]=='Ref':
-                        refs.append((child.attrib.get('id'),child.attrib.get('class')))
-                    lines.append(f'DIM {pos} {did} refs={refs}')
-                targets=['Airuno','Barzago','Barzan','Brivio','Calco','Casatenovo','Cassago','Cernusco Lombardone','Cremella','Imbersago','Valletta Brianza','Lomagna','Merate','Missaglia','Montevecchia','Monticello Brianza','Olgiate Molgora','Osnago','Paderno','Robbiate','Santa Maria','Sirtori','Verderio','Vigano']
-                for cl in root.iter():
-                  if cl.tag.split('}')[-1] != 'Codelist': continue
-                  cid=cl.attrib.get('id',''); hits=[]
-                  for code in list(cl):
-                    if code.tag.split('}')[-1] != 'Code': continue
-                    code_id=code.attrib.get('id',''); names=[]
-                    for n in code:
-                      if n.tag.split('}')[-1] in {'Name','Description'} and n.text:
-                        names.append(n.text.strip())
-                    text=' | '.join(names)
-                    if any(t.lower() in text.lower() for t in targets): hits.append((code_id,text))
-                  if hits:
-                    lines.append(f'CODELIST {cid} municipality hits={len(hits)}')
-                    lines += [f'  {a}\t{b}' for a,b in hits]
-              except Exception as e:
-                lines.append(f'XML parse error {name}: {e!r}')
-          (out/'probe.txt').write_text('\n'.join(lines),encoding='utf-8')
-          print('\n'.join(lines))
+          ages='+'.join([f'Y{i}' for i in range(15,30)]+['TOTAL'])
+          key=f'A.097048.JAN.9.{ages}.99'
+          url=f'https://esploradati.istat.it/SDMXWS/rest/data/IT1,22_289_DF_DCIS_POPRES1_24,1.0/{key}'
+          req=urllib.request.Request(url, headers={
+            'Accept':'application/vnd.sdmx.data+csv;version=1.0.0',
+            'User-Agent':'Mozilla/5.0'
+          })
+          try:
+            with urllib.request.urlopen(req, timeout=240) as r:
+              data=r.read(); status=r.status; ctype=r.headers.get('content-type')
+          except urllib.error.HTTPError as e:
+            data=e.read(); status=e.code; ctype=e.headers.get('content-type')
+          (out/'istat_merate_sample.csv').write_bytes(data)
+          print('STATUS',status,ctype,'bytes',len(data),'url',url)
+          text=data.decode('utf-8-sig',errors='replace')
+          print('\n'.join(text.splitlines()[:10]))
+          if status < 400:
+            rows=list(csv.DictReader(io.StringIO(text)))
+            print('rows',len(rows),'columns',list(rows[0]) if rows else [])
+            rows2024=[r for r in rows if r.get('TIME_PERIOD')=='2024']
+            print('2024 rows',len(rows2024))
+            for r in rows2024: print(r)
+          if status >= 400: raise SystemExit(status)
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: istat-sdmx-probe
+          name: istat-merate-sample
           path: acquisition_probe/
