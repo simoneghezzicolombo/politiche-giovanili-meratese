@@ -104,6 +104,26 @@ Nota standard da accompagnare al grafico:
 
 La complessità metodologica resta nel repository. L’output pubblico deve restare leggibile.
 
+## Benchmark complementare Istat: opportunità per under 18
+
+Accanto al benchmark contabile M06-P02, il repository include ora un secondo indicatore, costruito sui dati Istat **Interventi e servizi sociali dei Comuni - Ambiti territoriali sociali (ATS)**.
+
+La domanda è diversa: **quanto spendono i territori, per residente 0-17, in un paniere omogeneo di opportunità sociali, ricreative e di autonomia?**
+
+Il paniere comprende attività ricreative/sociali/culturali, centri di aggregazione, centri estivi e interventi di sostegno o contributo all'inserimento lavorativo.
+
+Nel 2023 il **Meratese registra circa 8,3 euro per residente 0-17**, contro circa **16,4 euro della Lombardia**.
+
+Questo indicatore **non viene definito "spesa per politiche giovanili"**: è un proxy più circoscritto, costruito per confrontare una dimensione particolarmente pertinente al tema degli spazi, della socialità e delle opportunità per ragazze e ragazzi.
+
+Dettagli, fonti e limiti: [`docs/benchmark_istat_under18.md`](docs/benchmark_istat_under18.md).
+
+Per rigenerare dati e grafico:
+
+```bash
+python scripts/07_istat_under18_benchmark.py
+```
+
 ## Stato del progetto
 
 - [x] disegno metodologico
@@ -113,8 +133,9 @@ La complessità metodologica resta nel repository. L’output pubblico deve rest
 - [x] calcolo degli indicatori
 - [x] generazione automatica della coda di audit
 - [x] primo grafico pubblico
+- [x] benchmark ATS Istat su opportunità sociali, ricreative e di autonomia 0-17
 - [ ] acquisizione del file OpenBDAP 2024 definitivo
 - [ ] acquisizione del file Istat 1/1/2024
 - [ ] validazione dei 24 Comuni
-- [ ] benchmark Lombardia
+- [ ] benchmark Lombardia M06-P02
 - [ ] audit documentale dei valori bassi/nulli
