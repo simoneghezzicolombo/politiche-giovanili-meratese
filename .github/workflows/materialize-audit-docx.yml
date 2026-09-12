@@ -1,0 +1,47 @@
+name: Materialize audit DOCX
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/materialize-audit-docx.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild and validate DOCX
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p docs tmp/audit_spazi_giovani_docx
+          : > tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/277758b09cd84f7044b96480ac30da004537b55c/tmp/audit_spazi_giovani_docx/part01.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/c3a6585ffce3e47f3215c7368d8092e74bf1c8ec/tmp/audit_spazi_giovani_docx/part02.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/46afe6836b81e38434e560a60c39991bc0429263/tmp/audit_spazi_giovani_docx/part03.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/0fd3594f6640edfc5c123639c221c40a80605180/tmp/audit_spazi_giovani_docx/part04.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/6c2103dd84f1cc8214a9e0f700680b28e55dc763/tmp/audit_spazi_giovani_docx/part05.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/3440b4d8fd039217b3dce7ce3adefeb40956b2d9/tmp/audit_spazi_giovani_docx/part06.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          curl -fsSL 'https://raw.githubusercontent.com/simoneghezzicolombo/politiche-giovanili-meratese/52ab64d03c3b80a5178a05f891e0dbc53409d347/tmp/audit_spazi_giovani_docx/part07.b64' >> tmp/audit_spazi_giovani_docx/full.b64
+          test "$(wc -c < tmp/audit_spazi_giovani_docx/full.b64)" = "60928"
+          base64 -d tmp/audit_spazi_giovani_docx/full.b64 > docs/audit_spazi_giovani_meratese_2026.docx
+          test "$(stat -c%s docs/audit_spazi_giovani_meratese_2026.docx)" = "45695"
+          echo '1d7d0f49185dd7bc8493d6a787b9bb9aceb1d572845b206f37bb825da339a976  docs/audit_spazi_giovani_meratese_2026.docx' | sha256sum -c -
+          unzip -t docs/audit_spazi_giovani_meratese_2026.docx >/dev/null
+      - name: Clean staging files and commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf tmp/audit_spazi_giovani_docx
+          rm .github/workflows/materialize-audit-docx.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Add audit spazi giovani Meratese 2026'
+          git push
