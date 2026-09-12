@@ -1,0 +1,115 @@
+year,ref_area,territory,service_code,service_name,municipal_expenditure_eur
+2021,ITC4,Lombardia,RICSOC,"Attività ricreative, sociali, culturali",5997379
+2021,ITC4,Lombardia,AGGRC,Centri di aggregazione / sociali,5090509
+2021,ITC4,Lombardia,SUMDAYC,Centri diurni estivi,12053068
+2021,ITC4,Lombardia,WSRESID,Centri estivi o invernali (con pernottamento),40408
+2021,ITC4,Lombardia,EMPLOY,Sostegno all'inserimento lavorativo,1046474
+2021,ITC4,Lombardia,CONTEMP,Contributi per l'inserimento lavorativo,365930
+2021,T03040,Bellano,RICSOC,"Attività ricreative, sociali, culturali",69346
+2021,T03040,Bellano,AGGRC,Centri di aggregazione / sociali,1875
+2021,T03040,Bellano,SUMDAYC,Centri diurni estivi,72181
+2021,T03040,Bellano,WSRESID,Centri estivi o invernali (con pernottamento),0
+2021,T03040,Bellano,EMPLOY,Sostegno all'inserimento lavorativo,123604
+2021,T03040,Bellano,CONTEMP,Contributi per l'inserimento lavorativo,0
+2021,T03054,Caratese,RICSOC,"Attività ricreative, sociali, culturali",17058
+2021,T03054,Caratese,AGGRC,Centri di aggregazione / sociali,5000
+2021,T03054,Caratese,SUMDAYC,Centri diurni estivi,257132
+2021,T03054,Caratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2021,T03054,Caratese,EMPLOY,Sostegno all'inserimento lavorativo,0
+2021,T03054,Caratese,CONTEMP,Contributi per l'inserimento lavorativo,7409
+2021,T03041,Lecchese,RICSOC,"Attività ricreative, sociali, culturali",246849
+2021,T03041,Lecchese,AGGRC,Centri di aggregazione / sociali,26992
+2021,T03041,Lecchese,SUMDAYC,Centri diurni estivi,88272
+2021,T03041,Lecchese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2021,T03041,Lecchese,EMPLOY,Sostegno all'inserimento lavorativo,39290
+2021,T03041,Lecchese,CONTEMP,Contributi per l'inserimento lavorativo,6200
+2021,T03010,Isola Bergamasca,RICSOC,"Attività ricreative, sociali, culturali",285563
+2021,T03010,Isola Bergamasca,AGGRC,Centri di aggregazione / sociali,0
+2021,T03010,Isola Bergamasca,SUMDAYC,Centri diurni estivi,164753
+2021,T03010,Isola Bergamasca,WSRESID,Centri estivi o invernali (con pernottamento),0
+2021,T03010,Isola Bergamasca,EMPLOY,Sostegno all'inserimento lavorativo,73213
+2021,T03010,Isola Bergamasca,CONTEMP,Contributi per l'inserimento lavorativo,10450
+2021,T03042,Meratese,RICSOC,"Attività ricreative, sociali, culturali",68072
+2021,T03042,Meratese,AGGRC,Centri di aggregazione / sociali,4409
+2021,T03042,Meratese,SUMDAYC,Centri diurni estivi,89102
+2021,T03042,Meratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2021,T03042,Meratese,EMPLOY,Sostegno all'inserimento lavorativo,3161
+2021,T03042,Meratese,CONTEMP,Contributi per l'inserimento lavorativo,0
+2022,ITC4,Lombardia,RICSOC,"Attività ricreative, sociali, culturali",6663810
+2022,ITC4,Lombardia,AGGRC,Centri di aggregazione / sociali,5106837
+2022,ITC4,Lombardia,SUMDAYC,Centri diurni estivi,10311779
+2022,ITC4,Lombardia,WSRESID,Centri estivi o invernali (con pernottamento),87461
+2022,ITC4,Lombardia,EMPLOY,Sostegno all'inserimento lavorativo,994154
+2022,ITC4,Lombardia,CONTEMP,Contributi per l'inserimento lavorativo,306694
+2022,T03040,Bellano,RICSOC,"Attività ricreative, sociali, culturali",167638
+2022,T03040,Bellano,AGGRC,Centri di aggregazione / sociali,1986
+2022,T03040,Bellano,SUMDAYC,Centri diurni estivi,77193
+2022,T03040,Bellano,WSRESID,Centri estivi o invernali (con pernottamento),0
+2022,T03040,Bellano,EMPLOY,Sostegno all'inserimento lavorativo,94065
+2022,T03040,Bellano,CONTEMP,Contributi per l'inserimento lavorativo,0
+2022,T03054,Caratese,RICSOC,"Attività ricreative, sociali, culturali",92715
+2022,T03054,Caratese,AGGRC,Centri di aggregazione / sociali,5459
+2022,T03054,Caratese,SUMDAYC,Centri diurni estivi,234153
+2022,T03054,Caratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2022,T03054,Caratese,EMPLOY,Sostegno all'inserimento lavorativo,0
+2022,T03054,Caratese,CONTEMP,Contributi per l'inserimento lavorativo,9150
+2022,T03041,Lecchese,RICSOC,"Attività ricreative, sociali, culturali",204036
+2022,T03041,Lecchese,AGGRC,Centri di aggregazione / sociali,34746
+2022,T03041,Lecchese,SUMDAYC,Centri diurni estivi,62801
+2022,T03041,Lecchese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2022,T03041,Lecchese,EMPLOY,Sostegno all'inserimento lavorativo,42861
+2022,T03041,Lecchese,CONTEMP,Contributi per l'inserimento lavorativo,5250
+2022,T03010,Isola Bergamasca,RICSOC,"Attività ricreative, sociali, culturali",188876
+2022,T03010,Isola Bergamasca,AGGRC,Centri di aggregazione / sociali,7000
+2022,T03010,Isola Bergamasca,SUMDAYC,Centri diurni estivi,84044
+2022,T03010,Isola Bergamasca,WSRESID,Centri estivi o invernali (con pernottamento),11000
+2022,T03010,Isola Bergamasca,EMPLOY,Sostegno all'inserimento lavorativo,54605
+2022,T03010,Isola Bergamasca,CONTEMP,Contributi per l'inserimento lavorativo,5500
+2022,T03042,Meratese,RICSOC,"Attività ricreative, sociali, culturali",79634
+2022,T03042,Meratese,AGGRC,Centri di aggregazione / sociali,4409
+2022,T03042,Meratese,SUMDAYC,Centri diurni estivi,44583
+2022,T03042,Meratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2022,T03042,Meratese,EMPLOY,Sostegno all'inserimento lavorativo,2800
+2022,T03042,Meratese,CONTEMP,Contributi per l'inserimento lavorativo,0
+2023,ITC4,Lombardia,RICSOC,"Attività ricreative, sociali, culturali",7833797
+2023,ITC4,Lombardia,AGGRC,Centri di aggregazione / sociali,5545740
+2023,ITC4,Lombardia,SUMDAYC,Centri diurni estivi,11388514
+2023,ITC4,Lombardia,WSRESID,Centri estivi o invernali (con pernottamento),89786
+2023,ITC4,Lombardia,EMPLOY,Sostegno all'inserimento lavorativo,505247
+2023,ITC4,Lombardia,CONTEMP,Contributi per l'inserimento lavorativo,227076
+2023,T03040,Bellano,RICSOC,"Attività ricreative, sociali, culturali",67264
+2023,T03040,Bellano,AGGRC,Centri di aggregazione / sociali,1500
+2023,T03040,Bellano,SUMDAYC,Centri diurni estivi,34243
+2023,T03040,Bellano,WSRESID,Centri estivi o invernali (con pernottamento),0
+2023,T03040,Bellano,EMPLOY,Sostegno all'inserimento lavorativo,88110
+2023,T03040,Bellano,CONTEMP,Contributi per l'inserimento lavorativo,0
+2023,T03054,Caratese,RICSOC,"Attività ricreative, sociali, culturali",32472
+2023,T03054,Caratese,AGGRC,Centri di aggregazione / sociali,0
+2023,T03054,Caratese,SUMDAYC,Centri diurni estivi,353306
+2023,T03054,Caratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2023,T03054,Caratese,EMPLOY,Sostegno all'inserimento lavorativo,0
+2023,T03054,Caratese,CONTEMP,Contributi per l'inserimento lavorativo,17875
+2023,T03041,Lecchese,RICSOC,"Attività ricreative, sociali, culturali",188638
+2023,T03041,Lecchese,AGGRC,Centri di aggregazione / sociali,9887
+2023,T03041,Lecchese,SUMDAYC,Centri diurni estivi,70863
+2023,T03041,Lecchese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2023,T03041,Lecchese,EMPLOY,Sostegno all'inserimento lavorativo,40417
+2023,T03041,Lecchese,CONTEMP,Contributi per l'inserimento lavorativo,5164
+2023,T03010,Isola Bergamasca,RICSOC,"Attività ricreative, sociali, culturali",98372
+2023,T03010,Isola Bergamasca,AGGRC,Centri di aggregazione / sociali,60929
+2023,T03010,Isola Bergamasca,SUMDAYC,Centri diurni estivi,17704
+2023,T03010,Isola Bergamasca,WSRESID,Centri estivi o invernali (con pernottamento),0
+2023,T03010,Isola Bergamasca,EMPLOY,Sostegno all'inserimento lavorativo,68042
+2023,T03010,Isola Bergamasca,CONTEMP,Contributi per l'inserimento lavorativo,2571
+2023,T03042,Meratese,RICSOC,"Attività ricreative, sociali, culturali",78150
+2023,T03042,Meratese,AGGRC,Centri di aggregazione / sociali,4409
+2023,T03042,Meratese,SUMDAYC,Centri diurni estivi,60709
+2023,T03042,Meratese,WSRESID,Centri estivi o invernali (con pernottamento),10789
+2023,T03042,Meratese,EMPLOY,Sostegno all'inserimento lavorativo,0
+2023,T03042,Meratese,CONTEMP,Contributi per l'inserimento lavorativo,2678
+2023,T03054,Caratese,RICSOC,"Attività ricreative, sociali, culturali",32472
+2023,T03054,Caratese,AGGRC,Centri di aggregazione / sociali,0
+2023,T03054,Caratese,SUMDAYC,Centri diurni estivi,353306
+2023,T03054,Caratese,WSRESID,Centri estivi o invernali (con pernottamento),0
+2023,T03054,Caratese,EMPLOY,Sostegno all'inserimento lavorativo,0
+2023,T03054,Caratese,CONTEMP,Contributi per l'inserimento lavorativo,17875
