@@ -1,12 +1,16 @@
-name: Render socialita figures
+name: Render public figures
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
+      - 'visuals/**'
       - 'analisi/socialita/render_socialita.py'
       - 'analisi/socialita/data/indicatori_socialita_lombardia_14_17_2013_2024.csv'
+      - 'scripts/07_istat_under18_benchmark.py'
+      - 'data/raw/istat_ats/istat_ats_selected_2021_2023.csv'
+      - '.github/workflows/render-socialita.yml'
 
 permissions:
   contents: write
@@ -26,8 +30,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Render figures
+      - name: Render socialita figures
         run: python analisi/socialita/render_socialita.py
+
+      - name: Render municipal spending benchmark
+        run: python scripts/07_istat_under18_benchmark.py
 
       - name: Commit rendered figures
         shell: bash
@@ -35,10 +42,15 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add analisi/socialita/figures/
+          git add \
+            analisi/socialita/figures/ \
+            outputs/benchmark_opportunita_under18_2023.png \
+            outputs/benchmark_opportunita_under18_2023.svg \
+            data/processed/istat_under18_opportunities_2021_2023.csv \
+            data/processed/istat_under18_opportunities_components_2021_2023.csv
           if git diff --cached --quiet; then
             echo 'Nessuna modifica da committare.'
           else
-            git commit -m 'Render socialita figures'
+            git commit -m 'Render aligned public figures'
             git push origin main
           fi
