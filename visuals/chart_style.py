@@ -48,13 +48,19 @@ def add_title_block(fig, title: str, subtitle: str, kicker: str | None = None) -
             ha="left", va="top", fontsize=10.5,
             fontweight="bold", color=ACCENT,
         )
+        title_y = 0.915
+        subtitle_y = 0.858
+    else:
+        title_y = 0.945
+        subtitle_y = 0.885
+
     fig.text(
-        x, 0.915, title,
+        x, title_y, title,
         ha="left", va="top", fontsize=22,
         fontweight="bold", color=INK,
     )
     fig.text(
-        x, 0.858, subtitle,
+        x, subtitle_y, subtitle,
         ha="left", va="top", fontsize=11.5,
         color=MUTED,
     )
