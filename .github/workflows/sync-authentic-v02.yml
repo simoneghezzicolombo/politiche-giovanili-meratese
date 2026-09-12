@@ -1,0 +1,43 @@
+name: Sync authentic v0.2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-authentic-v02.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore supplied v0.2 archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .sync/v02.part00 .sync/v02.part01 .sync/v02.part02 .sync/v02.part03 | base64 -d > /tmp/v02.zip
+          rm -rf /tmp/v02
+          mkdir -p /tmp/v02
+          unzip -q /tmp/v02.zip -d /tmp/v02
+          test -f /tmp/v02/politiche-giovanili-meratese/README.md
+          test -f /tmp/v02/politiche-giovanili-meratese/scripts/01_openbdap.py
+          test -f /tmp/v02/politiche-giovanili-meratese/scripts/02_istat_population.py
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/v02/politiche-giovanili-meratese/. .
+          rm -rf scripts/__pycache__
+      - name: Commit authentic v0.2
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git status --short
+          git commit -m "Sync authentic v0.2 from supplied archive"
+          git push origin main
