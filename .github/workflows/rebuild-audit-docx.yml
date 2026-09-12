@@ -48,3 +48,5 @@ jobs:
           fi
           git commit -m "Add verified youth spaces audit document"
           git push
+
+# Triggered after all verified base64 parts were staged.
