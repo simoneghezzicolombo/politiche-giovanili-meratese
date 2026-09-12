@@ -1,8 +1,8 @@
 """Costruisce popolazione totale e 15-29 dai file ufficiali demo.istat.it.
 
 Il file POSAS comunale ufficiale contiene una riga descrittiva prima
- dell'intestazione tabellare. Per questo viene letto con una routine dedicata,
-invece di affidarsi al lettore generico delle tabelle.
+dell'intestazione tabellare. Il codice Istat del Comune viene conservato per
+evitare di fondere Comuni omonimi presenti in regioni diverse.
 """
 from __future__ import annotations
 
@@ -17,11 +17,12 @@ import pandas as pd
 import requests
 
 sys.path.append(str(Path(__file__).resolve().parent))
-from _common import canonical_municipality, ensure_parent, find_column, norm_text, read_table  # noqa: E402
+from _common import canonical_municipality, ensure_parent, find_column, norm_code, norm_text, read_table  # noqa: E402
 
 DEFAULT_URL = "https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip"
 
 ALIASES = {
+    "codice": ["codice comune", "codice istat comune", "codice comune istat"],
     "comune": ["comune", "denominazione comune", "nome comune", "comune descrizione"],
     "eta": ["eta", "età", "eta anni", "classe eta"],
     "sesso": ["sesso", "sex"],
@@ -104,7 +105,6 @@ def read_posas_table(source: str | Path) -> pd.DataFrame:
     if name.lower().endswith((".csv", ".txt")):
         return _read_posas_csv(data)
 
-    # Manteniamo compatibilità con eventuali estrazioni XLSX già preparate.
     return read_table(source)
 
 
@@ -116,6 +116,7 @@ def main() -> None:
     args = parser.parse_args()
 
     df = read_posas_table(args.input)
+    codice = find_column(df.columns, ALIASES["codice"])
     comune = find_column(df.columns, ALIASES["comune"])
     eta = find_column(df.columns, ALIASES["eta"])
     sesso = find_column(df.columns, ALIASES["sesso"], required=False)
@@ -131,6 +132,7 @@ def main() -> None:
     df = df[df["_age"].notna()].copy()
     df["_age"] = df["_age"].astype(int)
     df["_pop"] = numeric(df[valore])
+    df["codice_comune"] = df[codice].map(lambda x: norm_code(x, 6))
     df["comune_key"] = df[comune].map(canonical_municipality)
 
     if sesso:
@@ -139,35 +141,38 @@ def main() -> None:
         if total_mask.any():
             df = df.loc[total_mask].copy()
 
-    age = df.groupby(["comune_key", "_age"], as_index=False)["_pop"].sum()
+    id_cols = ["codice_comune", "comune_key"]
+    age = df.groupby(id_cols + ["_age"], as_index=False)["_pop"].sum()
 
     total_rows = age[age["_age"] == 999]
     if not total_rows.empty:
-        total = total_rows[["comune_key", "_pop"]].rename(columns={"_pop": "pop_totale"})
+        total = total_rows[id_cols + ["_pop"]].rename(columns={"_pop": "pop_totale"})
     else:
         total = (
             age[age["_age"] < 999]
-            .groupby("comune_key", as_index=False)["_pop"].sum()
+            .groupby(id_cols, as_index=False)["_pop"].sum()
             .rename(columns={"_pop": "pop_totale"})
         )
 
     youth = (
         age[age["_age"].between(15, 29)]
-        .groupby("comune_key", as_index=False)["_pop"].sum()
+        .groupby(id_cols, as_index=False)["_pop"].sum()
         .rename(columns={"_pop": "pop_15_29"})
     )
-    out = total.merge(youth, on="comune_key", how="left")
+    out = total.merge(youth, on=id_cols, how="left")
     out["pop_15_29"] = out["pop_15_29"].fillna(0).astype(int)
     out["pop_totale"] = out["pop_totale"].astype(int)
     out["pop_data_riferimento"] = f"{args.year}-01-01"
 
     if len(out) < 7000:
         raise SystemExit(f"Controllo di sicurezza fallito: trovati solo {len(out)} comuni nel POSAS.")
+    if out["codice_comune"].duplicated().any():
+        raise SystemExit("Controllo di sicurezza fallito: codici Istat comunali duplicati.")
     if (out["pop_totale"] <= 0).any():
         raise SystemExit("Controllo di sicurezza fallito: popolazioni comunali non positive.")
 
     path = ensure_parent(args.output)
-    out.sort_values("comune_key").to_csv(path, index=False)
+    out.sort_values("codice_comune").to_csv(path, index=False)
     print(f"Salvati {len(out):,} comuni in {path}")
     print(f"Popolazione totale nazionale nel file: {out['pop_totale'].sum():,.0f}")
 
