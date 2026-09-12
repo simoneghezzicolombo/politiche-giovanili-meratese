@@ -14,11 +14,16 @@ from _common import canonical_municipality, ensure_parent, find_column, norm_tex
 DEFAULT_URL = "https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip"
 
 ALIASES = {
-    "comune": ["comune", "denominazione comune", "nome comune", "comune descrizione"],
-    "eta": ["eta", "età", "eta anni", "classe eta"],
-    "sesso": ["sesso", "sex"],
-    "valore": ["totale", "popolazione", "residenti", "valore", "value"],
-    "anno": ["anno", "year"],
+    "comune": [
+        "territorio", "comune", "denominazione comune", "nome comune",
+        "comune descrizione",
+    ],
+    "eta": ["eta", "età", "eta anni", "classe eta", "eta1"],
+    "sesso": ["sesso", "sex", "sexistat1"],
+    "stato_civile": ["stato civile", "statocivile", "statciv2"],
+    "valore": ["value", "valore", "totale", "popolazione", "residenti"],
+    "anno": ["time", "seleziona periodo", "anno", "year"],
+    "indicatore": ["tipo di indicatore demografico", "tipo_dato15", "tipo dato15"],
 }
 
 
@@ -26,14 +31,38 @@ def parse_age(value: object) -> int | None:
     text = norm_text(value)
     if not text:
         return None
-    if "100" in text and ("oltre" in text or "+" in str(value)):
+    if text in {"totale", "total", "tutte le eta"}:
+        return 999
+    if "100" in text and ("oltre" in text or "+" in str(value) or "piu" in text):
         return 100
     match = re.search(r"\b(\d{1,3})\b", text)
     return int(match.group(1)) if match else None
 
 
 def numeric(series: pd.Series) -> pd.Series:
-    return pd.to_numeric(series.astype(str).str.replace(r"[^0-9\-]", "", regex=True), errors="coerce").fillna(0)
+    if pd.api.types.is_numeric_dtype(series):
+        return pd.to_numeric(series, errors="coerce").fillna(0)
+    text = series.astype(str).str.strip()
+    # I file demografici sono conteggi interi, ma tolleriamo separatori delle migliaia.
+    text = text.str.replace(".", "", regex=False).str.replace(",", "", regex=False)
+    text = text.str.replace(r"[^0-9\-]", "", regex=True)
+    return pd.to_numeric(text, errors="coerce").fillna(0)
+
+
+def keep_total_dimension(df: pd.DataFrame, column: str | None, label: str) -> pd.DataFrame:
+    """Se la dimensione espone una modalità totale, usa solo quella.
+
+    È fondamentale per non sommare, per esempio, sia il totale per stato civile
+    sia celibi/nubili + coniugati + divorziati + vedovi.
+    """
+    if not column:
+        return df
+    values = df[column].map(norm_text)
+    total_mask = values.isin({"totale", "tot", "t", "total", "tutti", "tutte"})
+    if total_mask.any():
+        return df.loc[total_mask].copy()
+    print(f"Nota: nessuna modalità totale riconosciuta per {label}; mantengo tutte le righe.")
+    return df
 
 
 def main() -> None:
@@ -47,13 +76,25 @@ def main() -> None:
     comune = find_column(df.columns, ALIASES["comune"])
     eta = find_column(df.columns, ALIASES["eta"])
     sesso = find_column(df.columns, ALIASES["sesso"], required=False)
+    stato_civile = find_column(df.columns, ALIASES["stato_civile"], required=False)
     valore = find_column(df.columns, ALIASES["valore"])
     anno = find_column(df.columns, ALIASES["anno"], required=False)
+    indicatore = find_column(df.columns, ALIASES["indicatore"], required=False)
 
     if anno:
         years = pd.to_numeric(df[anno], errors="coerce")
         if (years == args.year).any():
             df = df.loc[years == args.year].copy()
+
+    # Se il file contiene più indicatori, teniamo la popolazione al 1° gennaio.
+    if indicatore:
+        ind = df[indicatore].map(norm_text)
+        jan = ind.str.contains("popolazione", na=False) & ind.str.contains("1 gennaio", na=False)
+        if jan.any():
+            df = df.loc[jan].copy()
+
+    df = keep_total_dimension(df, sesso, "sesso")
+    df = keep_total_dimension(df, stato_civile, "stato civile")
 
     df["_age"] = df[eta].map(parse_age)
     df = df[df["_age"].notna()].copy()
@@ -61,24 +102,30 @@ def main() -> None:
     df["_pop"] = numeric(df[valore])
     df["comune_key"] = df[comune].map(canonical_municipality)
 
-    # Se il file contiene la modalità Totale per sesso, usa solo quella.
-    if sesso:
-        sex_norm = df[sesso].map(norm_text)
-        total_mask = sex_norm.isin({"totale", "tot", "t", "total"})
-        if total_mask.any():
-            df = df.loc[total_mask].copy()
+    # Dopo i filtri di dimensione deve esserci una sola osservazione per comune-età.
+    duplicates = df.duplicated(["comune_key", "_age"], keep=False)
+    if duplicates.any():
+        sample = (
+            df.loc[duplicates, [comune, eta]]
+            .drop_duplicates()
+            .head(10)
+            .to_dict("records")
+        )
+        raise SystemExit(
+            "ISTAT: più osservazioni per comune/età dopo i filtri; "
+            f"non sommo automaticamente per evitare doppi conteggi. Esempi: {sample}"
+        )
 
-    # Se restano più righe per comune-età, presumibilmente M/F o stato civile: somma.
-    age = df.groupby(["comune_key", "_age"], as_index=False)["_pop"].sum()
+    age = df[["comune_key", "_age", "_pop"]].copy()
 
-    # Nei file POSAS ufficiali l'età 999 è il totale comunale. Se presente,
-    # usiamo quella riga come popolazione totale e non la sommiamo alle singole età.
+    # Se è presente la riga Totale (codificata qui come 999), la usiamo;
+    # altrimenti sommiamo le singole età, escludendo eventuali codici speciali.
     total_rows = age[age["_age"] == 999]
     if not total_rows.empty:
         total = total_rows[["comune_key", "_pop"]].rename(columns={"_pop": "pop_totale"})
     else:
         total = (
-            age[age["_age"] < 999]
+            age[age["_age"].between(0, 120)]
             .groupby("comune_key", as_index=False)["_pop"].sum()
             .rename(columns={"_pop": "pop_totale"})
         )
@@ -93,9 +140,16 @@ def main() -> None:
     out["pop_totale"] = out["pop_totale"].astype(int)
     out["pop_data_riferimento"] = f"{args.year}-01-01"
 
+    # Controlli di plausibilità: il file nazionale dei Comuni deve contenere migliaia di enti.
+    if len(out) < 7000:
+        raise SystemExit(f"ISTAT: trovati solo {len(out)} territori comunali; file/schema da verificare.")
+    if (out["pop_15_29"] > out["pop_totale"]).any():
+        raise SystemExit("ISTAT: controllo fallito, popolazione 15-29 superiore alla popolazione totale.")
+
     path = ensure_parent(args.output)
     out.sort_values("comune_key").to_csv(path, index=False)
     print(f"Salvati {len(out):,} comuni in {path}")
+    print(f"Colonne: comune={comune!r}, eta={eta!r}, sesso={sesso!r}, stato_civile={stato_civile!r}, valore={valore!r}, anno={anno!r}")
 
 
 if __name__ == "__main__":
