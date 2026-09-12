@@ -1,84 +1,120 @@
-# Politiche giovanili nel Meratese
+# Politiche giovanili nei Comuni dell’Ambito di Merate
 
-Analisi comparativa delle politiche giovanili nei 24 Comuni dell'Ambito territoriale di Merate, in provincia di Lecco.
+Analisi comparativa della spesa comunale **esplicitamente classificata come Missione 06, Programma 02 “Giovani”** nei 24 Comuni dell’Ambito territoriale di Merate.
 
-## La domanda
+L’obiettivo è produrre un confronto comprensibile anche fuori dagli ambienti tecnici, senza attribuire a M06-P02 un significato più ampio di quello che la classificazione contabile consente.
 
-Quanto spendono i Comuni per le politiche giovanili?
+## La domanda in una frase
 
-La risposta più corretta non è un singolo numero. I bilanci comunali permettono però di costruire un indicatore semplice, replicabile e comprensibile: la spesa registrata nel **Programma 02 "Giovani" della Missione 06 "Politiche giovanili, sport e tempo libero"**.
+**Quanto contabilizzano i Comuni del Meratese nel programma di bilancio dedicato ai giovani, per ogni residente tra 15 e 29 anni?**
 
-Questo progetto usa quella voce come **indicatore contabile principale**, senza presentarla come se rappresentasse automaticamente tutta la spesa comunale destinata ai giovani.
+## Indicatore principale
 
-## Cosa confronteremo
+**Euro di spesa corrente M06-P02 impegnati nel 2024 per residente 15-29 anni.**
 
-Per ciascuno dei 24 Comuni:
+Indicatori di supporto:
 
-- impegni di competenza del rendiconto nel Programma 06.02;
-- euro per residente;
-- euro per giovane, quando è disponibile un denominatore demografico omogeneo;
-- andamento annuale e media pluriennale;
-- eventuali interventi rivolti ai giovani contabilizzati in altre missioni o programmi, documentati separatamente.
+- euro M06-P02 corrente per abitante;
+- M06-P02 corrente come percentuale della spesa corrente comunale;
+- investimenti M06-P02 in conto capitale, mostrati separatamente;
+- confronto con Comuni lombardi della stessa classe demografica.
 
-L'output pubblico deve essere leggibile anche da chi non conosce la contabilità degli enti locali.
+## Cosa NON significa il dato
 
-## Regola di comunicazione
+M06-P02 **non rappresenta necessariamente tutta la spesa destinata ai giovani**. Progetti per adolescenti e giovani possono essere contabilizzati in istruzione, servizi sociali, cultura, sport, lavoro oppure essere gestiti in forma associata tramite l’Ambito territoriale.
 
-La formulazione consigliata è:
+Per questo un valore pari a zero non viene mai tradotto automaticamente in “nessuna politica giovanile”. I valori nulli o molto bassi vengono sottoposti a un audit documentale separato.
 
-> **Quanto spendono i Comuni nella voce di bilancio "Giovani"?**
+## Anno e misura
 
-Non:
+- Rendiconto della gestione: **2024**
+- Misura: **impegni di competenza**
+- Spesa corrente: **Titolo 1**
+- Investimenti: **Titolo 2**, tenuti separati
+- Popolazione: residenti al **1° gennaio 2024**
+- Fascia giovane: **15-29 anni**
 
-> Quanto spendono davvero per i giovani?
+## Fonti primarie
 
-La seconda frase sarebbe troppo forte, perché una parte delle politiche che incidono sulla vita dei giovani può essere contabilizzata altrove, per esempio in istruzione, sociale, cultura, sport, trasporti, casa o interventi trasversali.
+- [RGS / OpenBDAP, Finanza degli Enti Territoriali](https://openbdap.rgs.mef.gov.it/it/FET/Analizza)
+- [Istat, Demografia in cifre, popolazione residente per sesso ed età](https://demo.istat.it/app/?i=POS)
+- Rendiconti, DUP, PEG e Amministrazione Trasparente dei singoli Comuni per gli approfondimenti
+- Retesalute / Ufficio di Piano dell’Ambito di Merate per la gestione associata
 
-## Ambito territoriale
+OpenBDAP specifica che l’area Finanza degli Enti Territoriali utilizza documenti di bilancio approvati in via definitiva e trasmessi alla RGS. Istat rende disponibili file CSV della popolazione residente comunale per singola età.
 
-L'Ambito territoriale di Merate comprende 24 Comuni:
-
-Airuno, Barzago, Barzanò, Brivio, Calco, Casatenovo, Cassago Brianza, Cernusco Lombardone, Cremella, Imbersago, La Valletta Brianza, Lomagna, Merate, Missaglia, Montevecchia, Monticello Brianza, Olgiate Molgora, Osnago, Paderno d'Adda, Robbiate, Santa Maria Hoè, Sirtori, Verderio e Viganò.
-
-L'elenco è verificato sulle fonti istituzionali dell'Ambito e di ATS Brianza.
-
-## Struttura del repository
+## Pipeline
 
 ```text
-data/
-  metadata/       elenco dei 24 Comuni
-  input/          dati normalizzati da compilare o importare
-  output/         tabelle generate dagli script
-docs/
-  metodologia.md  scelte metodologiche e limiti
-  fonti.md        fonti ufficiali e criteri di verifica
-scripts/
-  01_indicatori.py
-  02_grafico.py
+OpenBDAP/RGS 2024 ─┐
+                   ├─> dataset comunale ─> indicatori ─> audit ─> grafici
+Istat 1/1/2024 ────┘
 ```
+
+Gli script **non dipendono dall’interfaccia web** dei due portali. Accettano i file ufficiali CSV/XLSX/ZIP scaricati dalle rispettive aree dati, così l’analisi resta replicabile anche se cambia la UI.
 
 ## Avvio rapido
 
-1. Inserire i dati annuali in `data/input/spesa_programma_giovani.csv`.
-2. Inserire le popolazioni in `data/input/popolazione.csv`.
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+```
+
+1. Scaricare il rendiconto armonizzato 2024 da OpenBDAP e salvarlo in `data/raw/`.
+2. Scaricare da Istat la popolazione residente per singola età al 1° gennaio 2024 e salvarla in `data/raw/`.
 3. Eseguire:
 
 ```bash
-python scripts/01_indicatori.py
-python scripts/02_grafico.py
+python scripts/01_openbdap.py --input data/raw/NOME_FILE_OPENBDAP.zip
+python scripts/02_istat_population.py --year 2024  # scarica automaticamente POSAS_2024_it_Comuni.zip
+python scripts/03_build_dataset.py
+python scripts/05_audit_low_values.py
+python scripts/06_figures.py
 ```
 
-Gli output vengono salvati in `data/output/`.
+Oppure, con `make`:
 
-## Stato
+```bash
+make openbdap OPENBDAP=data/raw/NOME_FILE_OPENBDAP.zip
+make istat ISTAT=data/raw/NOME_FILE_ISTAT.zip  # oppure eseguire direttamente lo script senza --input
+make dataset
+```
 
-**v0.2, struttura metodologica iniziale.**
+Gli script sono intenzionalmente **fail-fast**: se lo schema del file ufficiale non è riconosciuto, si fermano e mostrano le colonne disponibili invece di produrre valori incerti.
 
-Il repository non contiene ancora risultati empirici completi. La priorità della v0.2 è fissare un metodo trasparente prima di costruire classifiche o visualizzazioni.
+## Struttura
 
-## Fonti principali
+- `config/`: elenco dei 24 Comuni
+- `data/raw/`: fonti originali non modificate
+- `data/interim/`: estrazioni normalizzate
+- `data/processed/`: dataset finale
+- `metadata/`: registro delle fonti e audit dei casi anomali
+- `scripts/`: pipeline riproducibile
+- `docs/`: metodologia e contratto dei dati
+- `outputs/`: tabelle e grafici destinati alla comunicazione
 
-- OpenBDAP, Ragioneria Generale dello Stato: https://openbdap.rgs.mef.gov.it/it/FET/Analizza
-- Inquadramento dei bilanci armonizzati: https://openbdap.rgs.mef.gov.it/it/Home/IlBilancioDegliEntiTerritoriali
-- ATS Brianza, Comuni e aree distrettuali: https://www.ats-brianza.it/search-results/148-servizi-ai-cittadini/3451-comuni-e-aree-distrettuali
-- ISTAT, dati demografici: https://demo.istat.it/
+## Output pubblico
+
+Il grafico principale risponde a una sola domanda: **quanti euro vengono esplicitamente contabilizzati nel Programma “Giovani” per ogni residente 15-29enne?**
+
+Nota standard da accompagnare al grafico:
+
+> Il dato riguarda la spesa corrente contabilizzata nel Programma 06.02 “Giovani” e non necessariamente tutte le attività comunali rivolte ai giovani. I valori molto bassi o nulli sono verificati separatamente.
+
+La complessità metodologica resta nel repository. L’output pubblico deve restare leggibile.
+
+## Stato del progetto
+
+- [x] disegno metodologico
+- [x] struttura riproducibile del repository
+- [x] parser flessibile per file OpenBDAP/RGS
+- [x] parser per popolazione Istat per singola età
+- [x] calcolo degli indicatori
+- [x] generazione automatica della coda di audit
+- [x] primo grafico pubblico
+- [ ] acquisizione del file OpenBDAP 2024 definitivo
+- [ ] acquisizione del file Istat 1/1/2024
+- [ ] validazione dei 24 Comuni
+- [ ] benchmark Lombardia
+- [ ] audit documentale dei valori bassi/nulli

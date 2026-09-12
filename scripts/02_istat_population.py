@@ -1,0 +1,102 @@
+"""Costruisce popolazione totale e 15-29 dai file ufficiali demo.istat.it."""
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+import re
+import sys
+
+import pandas as pd
+
+sys.path.append(str(Path(__file__).resolve().parent))
+from _common import canonical_municipality, ensure_parent, find_column, norm_text, read_table  # noqa: E402
+
+DEFAULT_URL = "https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip"
+
+ALIASES = {
+    "comune": ["comune", "denominazione comune", "nome comune", "comune descrizione"],
+    "eta": ["eta", "età", "eta anni", "classe eta"],
+    "sesso": ["sesso", "sex"],
+    "valore": ["totale", "popolazione", "residenti", "valore", "value"],
+    "anno": ["anno", "year"],
+}
+
+
+def parse_age(value: object) -> int | None:
+    text = norm_text(value)
+    if not text:
+        return None
+    if "100" in text and ("oltre" in text or "+" in str(value)):
+        return 100
+    match = re.search(r"\b(\d{1,3})\b", text)
+    return int(match.group(1)) if match else None
+
+
+def numeric(series: pd.Series) -> pd.Series:
+    return pd.to_numeric(series.astype(str).str.replace(r"[^0-9\-]", "", regex=True), errors="coerce").fillna(0)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", default=DEFAULT_URL, help="CSV/ZIP Istat; default: POSAS 2024 Comuni ufficiale")
+    parser.add_argument("--year", type=int, default=2024, help="Anno della popolazione al 1° gennaio")
+    parser.add_argument("--output", default="data/interim/istat_pop_2024.csv")
+    args = parser.parse_args()
+
+    df = read_table(args.input)
+    comune = find_column(df.columns, ALIASES["comune"])
+    eta = find_column(df.columns, ALIASES["eta"])
+    sesso = find_column(df.columns, ALIASES["sesso"], required=False)
+    valore = find_column(df.columns, ALIASES["valore"])
+    anno = find_column(df.columns, ALIASES["anno"], required=False)
+
+    if anno:
+        years = pd.to_numeric(df[anno], errors="coerce")
+        if (years == args.year).any():
+            df = df.loc[years == args.year].copy()
+
+    df["_age"] = df[eta].map(parse_age)
+    df = df[df["_age"].notna()].copy()
+    df["_age"] = df["_age"].astype(int)
+    df["_pop"] = numeric(df[valore])
+    df["comune_key"] = df[comune].map(canonical_municipality)
+
+    # Se il file contiene la modalità Totale per sesso, usa solo quella.
+    if sesso:
+        sex_norm = df[sesso].map(norm_text)
+        total_mask = sex_norm.isin({"totale", "tot", "t", "total"})
+        if total_mask.any():
+            df = df.loc[total_mask].copy()
+
+    # Se restano più righe per comune-età, presumibilmente M/F o stato civile: somma.
+    age = df.groupby(["comune_key", "_age"], as_index=False)["_pop"].sum()
+
+    # Nei file POSAS ufficiali l'età 999 è il totale comunale. Se presente,
+    # usiamo quella riga come popolazione totale e non la sommiamo alle singole età.
+    total_rows = age[age["_age"] == 999]
+    if not total_rows.empty:
+        total = total_rows[["comune_key", "_pop"]].rename(columns={"_pop": "pop_totale"})
+    else:
+        total = (
+            age[age["_age"] < 999]
+            .groupby("comune_key", as_index=False)["_pop"].sum()
+            .rename(columns={"_pop": "pop_totale"})
+        )
+
+    youth = (
+        age[age["_age"].between(15, 29)]
+        .groupby("comune_key", as_index=False)["_pop"].sum()
+        .rename(columns={"_pop": "pop_15_29"})
+    )
+    out = total.merge(youth, on="comune_key", how="left")
+    out["pop_15_29"] = out["pop_15_29"].fillna(0).astype(int)
+    out["pop_totale"] = out["pop_totale"].astype(int)
+    out["pop_data_riferimento"] = f"{args.year}-01-01"
+
+    path = ensure_parent(args.output)
+    out.sort_values("comune_key").to_csv(path, index=False)
+    print(f"Salvati {len(out):,} comuni in {path}")
+
+
+if __name__ == "__main__":
+    main()
