@@ -1,0 +1,145 @@
+FREQ,REF_AREA,Territorio,DATA_TYPE,Indicatore,CATEG_OF_BENEFICIARIES,Area di utenza,CATEGORY_OF_SERVICE,Servizio o intervento,TIME_PERIOD,Osservazione
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,5997379
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,1046474
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,365930
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,12053068
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,5090509
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,40408
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,614077247
+A,ITC4,Lombardia,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,383
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,285563
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,73213
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,10450
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,164753
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,0
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,0
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,4688250
+A,T03010,Distretto Isola Bergamasca,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,199
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,69346
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,123604
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,72181
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,1875
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,3170973
+A,T03040,Distretto di Bellano,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,405
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,246849
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,39290
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,6200
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,88272
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,26992
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,0
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,5883358
+A,T03041,Distretto di Lecco,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,228
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,68072
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,3161
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,0
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,89102
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,4409
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,0
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,3438320
+A,T03042,Distretto di Merate,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,176
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2021,17058
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2021,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2021,7409
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2021,257132
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2021,5000
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2021,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,7003947
+A,T03054,Distretto di Carate Brianza,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2021,279
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,7833797
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,505247
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,227076
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,11388514
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,5545740
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,89786
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,661681657
+A,ITC4,Lombardia,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,423
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,98372
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,68042
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,2571
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,17704
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,60929
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,0
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,4280705
+A,T03010,Distretto Isola Bergamasca,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,183
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,67264
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,88110
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,34243
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,1500
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,3737698
+A,T03040,Distretto di Bellano,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,496
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,188638
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,40417
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,5164
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,70863
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,9887
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,0
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,7281575
+A,T03041,Distretto di Lecco,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,296
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,78150
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,0
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,2678
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,60709
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,4409
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,10789
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,3953289
+A,T03042,Distretto di Merate,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,209
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2023,32472
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2023,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2023,17875
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2023,353306
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2023,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2023,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,7058664
+A,T03054,Distretto di Carate Brianza,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2023,289
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,6663810
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,994154
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,306694
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,10311779
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,5106837
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,87461
+A,ITC4,Lombardia,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,628884393
+A,ITC4,Lombardia,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,397
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,188876
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,54605
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,5500
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,84044
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,7000
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,11000
+A,T03010,Distretto Isola Bergamasca,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,4554509
+A,T03010,Distretto Isola Bergamasca,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,192
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,167638
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,94065
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,77193
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,1986
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,0
+A,T03040,Distretto di Bellano,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,3575871
+A,T03040,Distretto di Bellano,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,466
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,204036
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,42861
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,5250
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,62801
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,34746
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,0
+A,T03041,Distretto di Lecco,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,6950826
+A,T03041,Distretto di Lecco,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,278
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,79634
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,2800
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,0
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,44583
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,4409
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,0
+A,T03042,Distretto di Merate,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,3496454
+A,T03042,Distretto di Merate,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,182
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,RICSOC,"Attività ricreative, sociali, culturali",2022,92715
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,EMPLOY,Sostegno all’inserimento lavorativo,2022,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,CONTEMP,Contributi per l’inserimento lavorativo,2022,9150
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,SUMDAYC,Centri diurni estivi,2022,234153
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,AGGRC,Centri di aggregazione / sociali,2022,5459
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,WSRESID,Centri estivi o invernali (con pernottamento),2022,0
+A,T03054,Distretto di Carate Brianza,EXPMUN,Spesa dei comuni (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,7016579
+A,T03054,Distretto di Carate Brianza,EXPTPOP,Spesa dei comuni sulla popolazione di riferimento (euro),FAM,Famiglia e minori,ALL,Tutte le voci,2022,283
