@@ -90,3 +90,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# Modifica intenzionale per attivare il workflow di rendering su push.
