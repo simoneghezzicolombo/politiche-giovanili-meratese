@@ -56,7 +56,6 @@ def render_main(df: pd.DataFrame, figures: Path) -> None:
         fig,
         "Gli adolescenti lombardi si vedono meno spesso",
         "14–17enni che incontrano gli amici ogni giorno o più volte a settimana · 2013–2024",
-        "Socialità",
     )
 
     ax.annotate(
