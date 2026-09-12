@@ -29,6 +29,17 @@ def main() -> None:
     pop = pd.read_csv(args.popolazione)
 
     comuni["comune_key"] = comuni["comune"].map(canonical_municipality)
+
+    # Le fonti demografiche possono contenere anche etichette e codici del Comune.
+    # Nel merge teniamo solo la chiave canonica e i denominatori necessari, così
+    # non creiamo colonne comune_x/comune_y o codice_istat_x/codice_istat_y.
+    pop_keep = [c for c in ["comune_key", "pop_totale", "pop_15_29", "pop_data_riferimento"] if c in pop.columns]
+    required_pop = {"comune_key", "pop_totale", "pop_15_29"}
+    missing_pop = required_pop - set(pop_keep)
+    if missing_pop:
+        raise SystemExit("Colonne demografiche mancanti: " + ", ".join(sorted(missing_pop)))
+    pop = pop[pop_keep].copy()
+
     df = comuni.merge(bilanci, on="comune_key", how="left").merge(pop, on="comune_key", how="left")
 
     df["eur_m0602_per_abitante"] = safe_div(df["m0602_corrente_impegni"], df["pop_totale"])
