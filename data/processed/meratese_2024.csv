@@ -1,0 +1,25 @@
+comune,provincia,ambito,anno,pop_totale,pop_15_29,m0602_corrente_impegni,m0602_capitale_impegni,spesa_corrente_totale_impegni,eur_m0602_per_abitante,eur_m0602_per_giovane_15_29,pct_spesa_corrente_m0602,m0602_zero,dato_bilancio_mancante,dato_popolazione_mancante
+Santa Maria Hoè,LC,Merate,2024,2113,357,11507.84,0.0,1504484.61,5.446209181258873,32.23484593837535,0.7649024738112807,False,False,False
+Montevecchia,LC,Merate,2024,2681,409,6391.0,0.0,2016687.28,2.3838120104438643,15.625916870415647,0.31690585165985674,False,False,False
+Calco,LC,Merate,2024,5411,826,9600.0,0.0,3317737.76,1.7741637405285529,11.62227602905569,0.2893537914823021,False,False,False
+Barzanò,LC,Merate,2024,5039,753,5752.0,0.0,3344948.01,1.1414963286366342,7.6387782204515275,0.1719608192056773,False,False,False
+Casatenovo,LC,Merate,2024,13286,1929,7058.0,0.0,7791260.95,0.531235887400271,3.658890616899948,0.09058867422480568,False,False,False
+Brivio,LC,Merate,2024,4419,737,2000.0,0.0,3148668.62,0.45259108395564607,2.7137042062415198,0.06351891041490419,False,False,False
+Airuno,LC,Merate,2024,2868,462,0.0,0.0,1879493.61,0.0,0.0,0.0,True,False,False
+Barzago,LC,Merate,2024,2362,372,0.0,0.0,2140868.26,0.0,0.0,0.0,True,False,False
+Cernusco Lombardone,LC,Merate,2024,3845,608,0.0,0.0,2913805.21,0.0,0.0,0.0,True,False,False
+Cassago Brianza,LC,Merate,2024,4425,644,0.0,0.0,2831570.05,0.0,0.0,0.0,True,False,False
+La Valletta Brianza,LC,Merate,2024,4644,790,0.0,0.0,3434559.05,0.0,0.0,0.0,True,False,False
+Cremella,LC,Merate,2024,1663,260,0.0,0.0,1042248.52,0.0,0.0,0.0,True,False,False
+Lomagna,LC,Merate,2024,5020,728,0.0,0.0,4213174.27,0.0,0.0,0.0,True,False,False
+Merate,LC,Merate,2024,14882,2161,0.0,0.0,13239968.03,0.0,0.0,0.0,True,False,False
+Missaglia,LC,Merate,2024,8903,1263,0.0,0.0,5312459.39,0.0,0.0,0.0,True,False,False
+Imbersago,LC,Merate,2024,2482,348,0.0,0.0,1333512.36,0.0,0.0,0.0,True,False,False
+Monticello Brianza,LC,Merate,2024,4123,589,0.0,0.0,2587393.59,0.0,0.0,0.0,True,False,False
+Olgiate Molgora,LC,Merate,2024,6284,925,0.0,0.0,3692490.04,0.0,0.0,0.0,True,False,False
+Paderno d’Adda,LC,Merate,2024,3878,617,0.0,0.0,2571483.29,0.0,0.0,0.0,True,False,False
+Osnago,LC,Merate,2024,4712,738,0.0,0.0,3693753.81,0.0,0.0,0.0,True,False,False
+Robbiate,LC,Merate,2024,6324,1006,0.0,0.0,4283111.86,0.0,0.0,0.0,True,False,False
+Sirtori,LC,Merate,2024,2774,413,0.0,0.0,1764456.32,0.0,0.0,0.0,True,False,False
+Verderio,LC,Merate,2024,5452,927,0.0,0.0,3745058.67,0.0,0.0,0.0,True,False,False
+Viganò,LC,Merate,2024,2067,255,0.0,0.0,1469421.45,0.0,0.0,0.0,True,False,False
