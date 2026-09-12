@@ -52,5 +52,6 @@ jobs:
             echo 'Nessuna modifica da committare.'
           else
             git commit -m 'Render aligned public figures'
+            git pull --rebase origin main
             git push origin main
           fi
