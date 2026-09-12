@@ -6,6 +6,13 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/build-data.yml'
+      - 'scripts/**'
+      - 'config/**'
+      - 'requirements.txt'
+
+concurrency:
+  group: build-official-2024
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -69,17 +76,35 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import csv
+          import pandas as pd
           from datetime import datetime, timezone
           from pathlib import Path
           p = Path('metadata/source_log.csv')
           now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
-          rows = [
-              ['Lombardia - Comuni', 2024, 'rendiconto armonizzato; M06-P02 e spesa corrente', 'OpenBDAP/RGS', 'https://openbdap.rgs.mef.gov.it/Datasets_FET/rendiconto/2024/2024_Rendiconto%20-%20Schemi%20di%20bilancio_LOMBARDIA.zip', now, 'acquisito', 'File ufficiale usato dalla pipeline'],
-              ['Comuni italiani', 2024, 'popolazione residente totale e 15-29 anni', 'Istat POSAS', 'https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip', now, 'acquisito', 'Popolazione al 1 gennaio 2024'],
-          ]
-          with p.open('a', newline='', encoding='utf-8') as f:
-              csv.writer(f).writerows(rows)
+          rows = pd.DataFrame([
+              {
+                  'entity':'Lombardia - Comuni','year':2024,
+                  'variable':'rendiconto armonizzato; M06-P02 e spesa corrente',
+                  'source_type':'OpenBDAP/RGS',
+                  'source_url':'https://openbdap.rgs.mef.gov.it/Datasets_FET/rendiconto/2024/2024_Rendiconto%20-%20Schemi%20di%20bilancio_LOMBARDIA.zip',
+                  'retrieved_at':now,'status':'acquisito','notes':'File ufficiale usato dalla pipeline'
+              },
+              {
+                  'entity':'Comuni italiani','year':2024,
+                  'variable':'popolazione residente totale e 15-29 anni',
+                  'source_type':'Istat POSAS',
+                  'source_url':'https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip',
+                  'retrieved_at':now,'status':'acquisito','notes':'Popolazione al 1 gennaio 2024'
+              },
+          ])
+          if p.exists() and p.stat().st_size:
+              old = pd.read_csv(p)
+              all_rows = pd.concat([old, rows], ignore_index=True)
+          else:
+              all_rows = rows
+          key = ['entity','year','variable','source_type','source_url']
+          all_rows = all_rows.drop_duplicates(key, keep='last')
+          all_rows.to_csv(p, index=False)
           PY
 
       - name: Upload reproducible outputs
