@@ -14,6 +14,11 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pandas
+        run: pip install 'pandas>=2.0'
       - name: Download and inspect POSAS archive
         shell: bash
         run: |
@@ -22,12 +27,32 @@ jobs:
           curl --fail --location --retry 3 --retry-delay 2 "$URL" -o /tmp/istat.zip
           echo "Istat bytes: $(wc -c < /tmp/istat.zip)"
           python - <<'PY'
-          import zipfile
+          import io, zipfile
+          import pandas as pd
           p='/tmp/istat.zip'
           with zipfile.ZipFile(p) as z:
-              print('ARCHIVE MEMBERS')
-              for i, info in enumerate(z.infolist()):
-                  print(i, info.filename, info.file_size)
-                  if i >= 199:
-                      break
+              names=z.namelist()
+              print('ARCHIVE MEMBERS', names)
+              raw=z.read(names[0])
+          print('FIRST 500 BYTES:', repr(raw[:500]))
+          for enc in ('utf-8-sig','utf-8','cp1252','latin1'):
+              try:
+                  text=raw[:3000].decode(enc)
+                  print('DECODE', enc, repr(text[:1000]))
+                  break
+              except Exception as e:
+                  print('DECODE FAIL', enc, type(e).__name__, str(e))
+          for sep in (';', ',', '\t', '|'):
+              for enc in ('utf-8-sig','utf-8','cp1252','latin1'):
+                  try:
+                      df=pd.read_csv(io.BytesIO(raw), sep=sep, encoding=enc, nrows=5)
+                      print('PARSE OK', repr(sep), enc, 'shape=', df.shape)
+                      print('COLUMNS=', list(df.columns))
+                      print(df.head().to_string(index=False))
+                      raise SystemExit(0)
+                  except SystemExit:
+                      raise
+                  except Exception as e:
+                      print('PARSE FAIL', repr(sep), enc, type(e).__name__, str(e)[:300])
+          raise SystemExit('No parse succeeded')
           PY
