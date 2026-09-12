@@ -1,0 +1,30 @@
+name: Cleanup audit upload staging
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-audit-upload.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove transfer-only files
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -r -f tmp/audit_docx_full 2>/dev/null || true
+          git rm -r -f tmp/audit_spazi_giovani_docx 2>/dev/null || true
+          git rm -f .github/workflows/rebuild-audit-docx.yml 2>/dev/null || true
+          git rm -f .github/workflows/cleanup-audit-upload.yml 2>/dev/null || true
+          git rm -f __noop__ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Clean audit document upload staging"
+          git push
