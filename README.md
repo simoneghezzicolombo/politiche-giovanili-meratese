@@ -93,6 +93,7 @@ Gli script sono intenzionalmente **fail-fast**: se lo schema del file ufficiale 
 - `scripts/`: pipeline riproducibile
 - `docs/`: metodologia e contratto dei dati
 - `outputs/`: tabelle e grafici destinati alla comunicazione
+- `analisi/socialita/`: analisi di contesto sulla socialità degli adolescenti lombardi, con codice, serie 2013-2024, do-file originali e figure riproducibili
 
 ## Output pubblico
 
@@ -124,6 +125,14 @@ Per rigenerare dati e grafico:
 python scripts/07_istat_under18_benchmark.py
 ```
 
+## Analisi di contesto: socialità adolescenziale in Lombardia
+
+Il repository include anche una serie 2013-2024 sulla socialità dei **14-17enni lombardi**, ricostruita dai microdati Istat AVQ e collegata al tema delle opportunità giovanili.
+
+La figura principale mostra la quota che incontra gli amici **tutti i giorni o più di una volta a settimana**. La cartella contiene il CSV degli indicatori, la pipeline Python, i do-file Stata originali e un workflow che rigenera automaticamente PNG e SVG.
+
+Tutto il materiale è in [`analisi/socialita/`](analisi/socialita/).
+
 ## Stato del progetto
 
 - [x] disegno metodologico
@@ -134,6 +143,7 @@ python scripts/07_istat_under18_benchmark.py
 - [x] generazione automatica della coda di audit
 - [x] primo grafico pubblico
 - [x] benchmark ATS Istat su opportunità sociali, ricreative e di autonomia 0-17
+- [x] analisi riproducibile della socialità adolescenziale lombarda 2013-2024
 - [ ] acquisizione del file OpenBDAP 2024 definitivo
 - [ ] acquisizione del file Istat 1/1/2024
 - [ ] validazione dei 24 Comuni
