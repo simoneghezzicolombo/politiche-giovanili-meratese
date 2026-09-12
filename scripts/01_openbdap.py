@@ -1,14 +1,18 @@
-"""Estrae M06-P02 e spesa corrente dai dati ufficiali di rendiconto OpenBDAP/RGS.
+"""Estrae M06-P02 e spesa corrente dal rendiconto OpenBDAP/RGS.
 
-Lo script non dipende dalla UI del portale: accetta un CSV/XLSX/ZIP ufficiale già
-scaricato da OpenBDAP. È intenzionalmente severo: se non riconosce lo schema,
-si ferma invece di produrre numeri potenzialmente sbagliati.
+Per gli ZIP regionali FET lo script legge intenzionalmente il prospetto
+`Rendiconto SDB Spese`, che contiene una riga per ente, missione, programma e
+titolo. Non concatena gli altri prospetti dello ZIP, perché hanno schemi e
+livelli di aggregazione diversi e produrrebbero doppi conteggi.
 """
 from __future__ import annotations
 
 import argparse
+import io
 from pathlib import Path
+import re
 import sys
+import zipfile
 
 import pandas as pd
 
@@ -27,14 +31,31 @@ MISSION = "06"
 PROGRAM = "02"
 
 ALIASES = {
-    "comune": ["denominazione ente", "ente", "comune", "denominazione comune", "nome ente"],
-    "tipo_ente": ["tipo ente", "tipologia ente", "comparto", "tipo amministrazione"],
-    "anno": ["anno", "esercizio", "esercizio finanziario", "anno esercizio"],
-    "missione": ["codice missione", "cod missione", "missione codice", "missione"],
-    "programma": ["codice programma", "cod programma", "programma codice", "programma"],
-    "titolo": ["codice titolo", "cod titolo", "titolo codice", "titolo"],
-    "macro": ["codice macroaggregato", "cod macroaggregato", "macroaggregato codice", "macroaggregato"],
-    "impegni": ["impegni", "impegni esercizio", "impegni competenza", "impegni di competenza"],
+    "comune": [
+        "denominazione soggetto", "denominazione ente", "ente", "comune",
+        "denominazione comune", "nome ente",
+    ],
+    "tipo_ente": [
+        "descrizione tipologia soggetto", "tipo ente", "tipologia ente",
+        "comparto", "tipo amministrazione",
+    ],
+    "anno": ["esercizio finanziario", "anno", "esercizio", "anno esercizio"],
+    "missione": [
+        "codice missione arconet", "codice missione", "cod missione",
+        "missione codice", "missione",
+    ],
+    "programma": [
+        "codice programma arconet", "codice programma", "cod programma",
+        "programma codice", "programma",
+    ],
+    "titolo": [
+        "codice titolo spese arconet", "codice titolo", "cod titolo",
+        "titolo codice", "titolo",
+    ],
+    "impegni": [
+        "impegni", "impegni riepilogo", "impegni esercizio",
+        "impegni competenza", "impegni di competenza",
+    ],
 }
 
 
@@ -42,12 +63,63 @@ def numeric(series: pd.Series) -> pd.Series:
     if pd.api.types.is_numeric_dtype(series):
         return pd.to_numeric(series, errors="coerce").fillna(0.0)
     text = series.astype(str).str.strip()
-    # formato italiano: 1.234,56. Se non ci sono virgole, lascia il punto decimale.
     has_comma = text.str.contains(",", regex=False).any()
     if has_comma:
         text = text.str.replace(".", "", regex=False).str.replace(",", ".", regex=False)
     text = text.str.replace(r"[^0-9.\-]", "", regex=True)
     return pd.to_numeric(text, errors="coerce").fillna(0.0)
+
+
+def _read_csv_bytes(data: bytes) -> pd.DataFrame:
+    errors: list[str] = []
+    for encoding in ("utf-8-sig", "utf-8", "cp1252", "latin1"):
+        try:
+            return pd.read_csv(io.BytesIO(data), sep=None, engine="python", encoding=encoding)
+        except Exception as exc:  # pragma: no cover - diagnostic path
+            errors.append(f"{encoding}: {exc}")
+    raise ValueError("Impossibile leggere il CSV FET. " + " | ".join(errors))
+
+
+def select_fet_spese_member(names: list[str]) -> str:
+    """Trova il prospetto analitico `Rendiconto SDB Spese_<REGIONE>.csv`."""
+    candidates: list[str] = []
+    for name in names:
+        if not name.lower().endswith(".csv"):
+            continue
+        base = Path(name).name
+        normal = norm_text(base)
+        if "rendiconto sdb spese" not in normal:
+            continue
+        # Escludiamo riepiloghi, allegati e prospetti specializzati.
+        forbidden = (
+            "riepilogo", "allegato", "quadro generale", "voce di riepilogo",
+            "correnti per macroaggregato", "conto capitale per macroaggregato",
+            "rimborso di prestiti", "servizi conto terzi",
+        )
+        if any(token in normal for token in forbidden):
+            continue
+        # Il file cercato ha il nome essenziale: Rendiconto SDB Spese_<regione>.
+        if re.search(r"\brendiconto sdb spese\b", normal):
+            candidates.append(name)
+
+    if len(candidates) != 1:
+        shown = "\n".join(sorted(candidates)[:20]) or "(nessuno)"
+        raise ValueError(
+            "Impossibile identificare univocamente il prospetto FET `Rendiconto SDB Spese`. "
+            f"Candidati: {len(candidates)}\n{shown}"
+        )
+    return candidates[0]
+
+
+def read_spese_table(source: str | Path) -> tuple[pd.DataFrame, str]:
+    source_str = str(source)
+    if source_str.lower().endswith(".zip"):
+        with zipfile.ZipFile(source) as archive:
+            member = select_fet_spese_member(archive.namelist())
+            return _read_csv_bytes(archive.read(member)), member
+
+    # CSV/XLSX singolo: utile per test o estrazioni già effettuate.
+    return read_table(source), Path(source_str).name
 
 
 def detect_columns(df: pd.DataFrame) -> dict[str, str | None]:
@@ -61,25 +133,11 @@ def detect_columns(df: pd.DataFrame) -> dict[str, str | None]:
     return cols
 
 
-def filter_additive_rows(df: pd.DataFrame, cols: dict[str, str | None]) -> pd.DataFrame:
-    """Riduce il rischio di doppio conteggio quando il file contiene subtotali.
-
-    Se esiste il macroaggregato e sono presenti righe con codice valorizzato,
-    usa quelle come componenti additive ed esclude le righe di totale senza codice.
-    """
-    macro = cols.get("macro")
-    if macro:
-        codes = df[macro].map(norm_code)
-        if (codes != "").any():
-            df = df.loc[codes != ""].copy()
-    return df
-
-
 def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str | None]]:
     cols = detect_columns(df)
 
     if cols.get("anno"):
-        years = df[cols["anno"]].map(lambda x: norm_code(x))
+        years = df[cols["anno"]].map(norm_code)
         if (years == str(YEAR)).any():
             df = df.loc[years == str(YEAR)].copy()
 
@@ -89,13 +147,24 @@ def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, str | None]]:
         if comune_mask.any():
             df = df.loc[comune_mask].copy()
 
-    df = filter_additive_rows(df, cols)
     df["_comune_key"] = df[cols["comune"]].map(canonical_municipality)
     df["_comune_label"] = df[cols["comune"]].astype(str).str.strip()
     df["_missione"] = df[cols["missione"]].map(lambda x: norm_code(x, 2))
     df["_programma"] = df[cols["programma"]].map(lambda x: norm_code(x, 2))
     df["_titolo"] = df[cols["titolo"]].map(lambda x: norm_code(x, 2))
     df["_impegni"] = numeric(df[cols["impegni"]])
+
+    # Lo schema analitico deve essere additivo per ente/missione/programma/titolo.
+    # Se OpenBDAP cambia schema, fermiamoci invece di sommare duplicati in silenzio.
+    keys = ["_comune_key", "_missione", "_programma", "_titolo"]
+    duplicated = df.duplicated(keys, keep=False)
+    if duplicated.any():
+        sample = df.loc[duplicated, keys].drop_duplicates().head(10).to_dict("records")
+        raise ValueError(
+            "Il prospetto `Spese` contiene più righe per ente/missione/programma/titolo; "
+            f"schema da riesaminare. Esempi: {sample}"
+        )
+
     return df, cols
 
 
@@ -118,13 +187,13 @@ def aggregate(df: pd.DataFrame) -> pd.DataFrame:
 
     out = labels.merge(total_current, on="_comune_key", how="left")
     out = out.merge(current, on="_comune_key", how="left").merge(capital, on="_comune_key", how="left")
-    for c in ["m0602_corrente_impegni", "m0602_capitale_impegni"]:
-        out[c] = out[c].fillna(0.0)
+    for col in ["m0602_corrente_impegni", "m0602_capitale_impegni"]:
+        out[col] = out[col].fillna(0.0)
     out = out.rename(columns={"_comune_key": "comune_key", "_comune_label": "comune_fonte"})
     out["anno"] = YEAR
     return out[[
         "comune_key", "comune_fonte", "anno", "m0602_corrente_impegni",
-        "m0602_capitale_impegni", "spesa_corrente_totale_impegni"
+        "m0602_capitale_impegni", "spesa_corrente_totale_impegni",
     ]].sort_values("comune_key")
 
 
@@ -135,18 +204,25 @@ def main() -> None:
     parser.add_argument("--columns-report", default="data/interim/openbdap_2024_columns.txt")
     args = parser.parse_args()
 
-    raw = read_table(args.input)
     try:
+        raw, member = read_spese_table(args.input)
         prepared, cols = prepare(raw)
-    except KeyError as exc:
+    except (KeyError, ValueError) as exc:
         report = ensure_parent(args.columns_report)
-        report.write_text("\n".join(map(str, raw.columns)), encoding="utf-8")
+        columns = list(raw.columns) if "raw" in locals() else []
+        report.write_text("\n".join(map(str, columns)), encoding="utf-8")
         raise SystemExit(f"Schema OpenBDAP non riconosciuto: {exc}\nColonne salvate in {report}")
 
     out = aggregate(prepared)
+    if len(out) < 1000:
+        raise SystemExit(
+            f"Controllo di sicurezza fallito: trovati solo {len(out)} Comuni/enti comunali nel prospetto."
+        )
+
     path = ensure_parent(args.output)
     out.to_csv(path, index=False)
-    print(f"Salvate {len(out):,} righe in {path}")
+    print(f"Prospetto usato: {member}")
+    print(f"Salvati {len(out):,} Comuni in {path}")
     print("Colonne riconosciute:")
     for key, value in cols.items():
         print(f"  {key}: {value}")
