@@ -196,7 +196,6 @@ def make_chart(panel: pd.DataFrame):
         fig,
         "Spesa dei Comuni per ragazze e ragazzi",
         "Opportunità sociali, ricreative e di autonomia · euro per residente 0–17 · 2023",
-        "Risorse",
     )
     add_footer(
         fig,
