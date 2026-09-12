@@ -1,0 +1,110 @@
+name: Build official 2024 data
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-data.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download official OpenBDAP 2024 Lombardia rendiconto
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw data/interim data/processed outputs/figures outputs/tables metadata
+          URL='https://openbdap.rgs.mef.gov.it/Datasets_FET/rendiconto/2024/2024_Rendiconto%20-%20Schemi%20di%20bilancio_LOMBARDIA.zip'
+          curl --fail --location --retry 3 --retry-delay 2 "$URL" -o data/raw/openbdap_rendiconto_2024_lombardia.zip
+          test -s data/raw/openbdap_rendiconto_2024_lombardia.zip
+          echo "OpenBDAP bytes: $(wc -c < data/raw/openbdap_rendiconto_2024_lombardia.zip)"
+          unzip -tq data/raw/openbdap_rendiconto_2024_lombardia.zip
+
+      - name: Parse OpenBDAP
+        run: python scripts/01_openbdap.py --input data/raw/openbdap_rendiconto_2024_lombardia.zip
+
+      - name: Download and parse Istat population
+        run: python scripts/02_istat_population.py --year 2024
+
+      - name: Build Meratese dataset, audit and figure
+        run: |
+          python scripts/03_build_dataset.py
+          python scripts/05_audit_low_values.py
+          python scripts/06_figures.py
+
+      - name: Sanity checks
+        shell: bash
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          p = 'data/processed/meratese_2024.csv'
+          df = pd.read_csv(p)
+          assert len(df) == 24, f'Attesi 24 Comuni, trovati {len(df)}'
+          assert df['comune'].nunique() == 24, 'Nomi Comune duplicati'
+          assert df['dato_bilancio_mancante'].sum() == 0, 'Dati di bilancio mancanti'
+          assert df['dato_popolazione_mancante'].sum() == 0, 'Dati demografici mancanti'
+          assert (df['pop_15_29'] > 0).all(), 'Popolazione 15-29 non valida'
+          print(df[['comune','m0602_corrente_impegni','m0602_capitale_impegni','pop_15_29','eur_m0602_per_giovane_15_29']].to_string(index=False))
+          PY
+
+      - name: Record sources
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          from datetime import datetime, timezone
+          from pathlib import Path
+          p = Path('metadata/source_log.csv')
+          now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+          rows = [
+              ['Lombardia - Comuni', 2024, 'rendiconto armonizzato; M06-P02 e spesa corrente', 'OpenBDAP/RGS', 'https://openbdap.rgs.mef.gov.it/Datasets_FET/rendiconto/2024/2024_Rendiconto%20-%20Schemi%20di%20bilancio_LOMBARDIA.zip', now, 'acquisito', 'File ufficiale usato dalla pipeline'],
+              ['Comuni italiani', 2024, 'popolazione residente totale e 15-29 anni', 'Istat POSAS', 'https://demo.istat.it/data/posas/POSAS_2024_it_Comuni.zip', now, 'acquisito', 'Popolazione al 1 gennaio 2024'],
+          ]
+          with p.open('a', newline='', encoding='utf-8') as f:
+              csv.writer(f).writerows(rows)
+          PY
+
+      - name: Upload reproducible outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: meratese-2024-data
+          if-no-files-found: error
+          path: |
+            data/interim/*.csv
+            data/interim/*.txt
+            data/processed/*.csv
+            metadata/audit_queue_2024.csv
+            metadata/source_log.csv
+            outputs/figures/*.png
+
+      - name: Commit validated derived outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/processed/meratese_2024.csv metadata/audit_queue_2024.csv metadata/source_log.csv outputs/figures/euro_per_giovane_2024.png
+          if git diff --cached --quiet; then
+            echo 'Nessuna modifica da committare.'
+          else
+            git commit -m 'Build official Meratese 2024 dataset'
+            git push origin main
+          fi
