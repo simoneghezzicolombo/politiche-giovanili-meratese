@@ -26,9 +26,20 @@ def main() -> None:
 
     comuni = pd.read_csv(args.comuni)
     bilanci = pd.read_csv(args.bilanci)
-    pop = pd.read_csv(args.popolazione)
+    pop = pd.read_csv(args.popolazione, dtype={"codice_comune": "string"})
+
+    # Tutti i Comuni dell'Ambito sono in provincia di Lecco. Nei codici Istat
+    # comunali la provincia di Lecco ha prefisso 097: filtrarlo impedisce che
+    # eventuali omonimie nazionali producano join duplicati per denominazione.
+    if "codice_comune" in pop.columns:
+        pop["codice_comune"] = pop["codice_comune"].astype("string").str.zfill(6)
+        pop = pop[pop["codice_comune"].str.startswith("097", na=False)].copy()
 
     comuni["comune_key"] = comuni["comune"].map(canonical_municipality)
+    if pop["comune_key"].duplicated().any():
+        dup = pop.loc[pop["comune_key"].duplicated(keep=False), "comune_key"].unique().tolist()
+        raise SystemExit(f"Chiavi demografiche duplicate in provincia di Lecco: {dup[:20]}")
+
     df = comuni.merge(bilanci, on="comune_key", how="left").merge(pop, on="comune_key", how="left")
 
     df["eur_m0602_per_abitante"] = safe_div(df["m0602_corrente_impegni"], df["pop_totale"])
