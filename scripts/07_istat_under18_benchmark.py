@@ -16,14 +16,30 @@ Non equivale alla spesa complessiva per politiche giovanili.
 """
 
 from pathlib import Path
-import pandas as pd
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-
-mpl.rcParams['svg.fonttype'] = 'none'
+import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+import matplotlib as mpl
+mpl.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from visuals.chart_style import (
+    ACCENT,
+    BENCHMARK,
+    FIGSIZE,
+    INK,
+    OTHER,
+    add_footer,
+    add_title_block,
+    apply_project_style,
+    save_public_figure,
+    style_axis,
+)
+
 RAW = ROOT / "data" / "raw" / "istat_ats" / "istat_ats_selected_2021_2023.csv"
 PROCESSED = ROOT / "data" / "processed"
 OUTPUTS = ROOT / "outputs"
@@ -44,15 +60,6 @@ SERVICES = {
     "WSRESID": "Centri estivi o invernali (con pernottamento)",
     "EMPLOY": "Sostegno all'inserimento lavorativo",
     "CONTEMP": "Contributi per l'inserimento lavorativo",
-}
-
-COLORS = {
-    "Lombardia": "#08A045",
-    "Bellano": "#79B977",
-    "Caratese": "#E8A27A",
-    "Lecchese": "#49A7D8",
-    "Isola Bergamasca": "#9A8FC9",
-    "Meratese": "#E7A7A7",
 }
 
 
@@ -127,99 +134,77 @@ def build_panel():
 
 
 def make_chart(panel: pd.DataFrame):
-    order = [
-        "Lombardia",
-        "Bellano",
-        "Caratese",
-        "Lecchese",
-        "Isola Bergamasca",
-        "Meratese",
+    apply_project_style()
+    p = (
+        panel[panel["year"] == 2023]
+        .sort_values("composite_eur_per_0_17", ascending=False)
+        .reset_index(drop=True)
+    )
+
+    fig, ax = plt.subplots(figsize=FIGSIZE)
+    fig.subplots_adjust(left=.23, right=.96, top=.78, bottom=.18)
+    style_axis(ax, "x")
+
+    colors = [
+        ACCENT if territory == "Meratese"
+        else BENCHMARK if territory == "Lombardia"
+        else OTHER
+        for territory in p["territory"]
     ]
-    p = panel[panel["year"] == 2023].set_index("territory").loc[order].reset_index()
-
-    fig, ax = plt.subplots(figsize=(12.5, 7.4))
-    fig.patch.set_facecolor("white")
-    ax.set_facecolor("white")
-
     y = np.arange(len(p))
     bars = ax.barh(
         y,
         p["composite_eur_per_0_17"],
-        color=[COLORS[t] for t in p["territory"]],
-        height=0.42,
+        color=colors,
+        height=.52,
     )
     ax.invert_yaxis()
-
-    ax.set_title(
-        "Quanto si investe per ragazze e ragazzi?",
-        fontsize=21,
-        fontweight="bold",
-        family="serif",
-        pad=18,
-    )
-    fig.text(
-        0.5,
-        0.895,
-        "Spesa comunale per opportunità sociali, ricreative e di autonomia · € per residente 0–17 · 2023",
-        ha="center",
-        fontsize=11.5,
-        family="serif",
-    )
-
-    ax.set_xlim(0, 30)
-    ax.set_xticks(np.arange(0, 31, 5))
+    ax.set_xlim(0, 28)
+    ax.set_xticks([0, 5, 10, 15, 20, 25])
+    ax.set_xticklabels(["0 €", "5 €", "10 €", "15 €", "20 €", "25 €"])
     ax.set_yticks(y)
-    ax.set_yticklabels(p["territory"], fontsize=13.5, family="serif")
-    ax.tick_params(axis="x", labelsize=11)
-    ax.tick_params(axis="y", length=0)
-    ax.xaxis.grid(True, color="#D8D8D8", linewidth=1)
-    ax.set_axisbelow(True)
-    for spine in ax.spines.values():
-        spine.set_visible(False)
-
-    for bar, value in zip(bars, p["composite_eur_per_0_17"]):
-        x = value * 0.5 if value >= 11 else value - 0.45
-        ha = "center" if value >= 11 else "right"
-        ax.text(
-            x,
-            bar.get_y() + bar.get_height() / 2,
-            f"{value:.1f} €",
-            va="center",
-            ha=ha,
-            fontsize=12.5,
-            fontweight="bold",
-            family="serif",
-            color="black",
-        )
+    ax.set_yticklabels(p["territory"], fontsize=11.5)
 
     for tick in ax.get_yticklabels():
         if tick.get_text() == "Meratese":
             tick.set_fontweight("bold")
+            tick.set_color(ACCENT)
+        elif tick.get_text() == "Lombardia":
+            tick.set_fontweight("bold")
+            tick.set_color(BENCHMARK)
 
-    fig.text(
-        0.07,
-        0.052,
-        "Fonte: elaborazione su dati Istat",
-        ha="left",
-        fontsize=10.5,
-        style="italic",
-        family="serif",
-        color="#5F5F5F",
+    for bar, territory, value in zip(
+        bars, p["territory"], p["composite_eur_per_0_17"]
+    ):
+        color = (
+            ACCENT if territory == "Meratese"
+            else BENCHMARK if territory == "Lombardia"
+            else INK
+        )
+        ax.text(
+            value + .35,
+            bar.get_y() + bar.get_height() / 2,
+            f"{value:.1f} €".replace(".", ","),
+            va="center",
+            ha="left",
+            fontsize=11.2,
+            fontweight="bold" if territory in {"Meratese", "Lombardia"} else "normal",
+            color=color,
+        )
+
+    add_title_block(
+        fig,
+        "Spesa dei Comuni per ragazze e ragazzi",
+        "Opportunità sociali, ricreative e di autonomia · euro per residente 0–17 · 2023",
+        "Risorse",
     )
-    fig.text(
-        0.5,
-        0.018,
-        "Indicatore composito: attività ricreative, sociali e culturali; centri di aggregazione; "
-        "centri estivi; sostegno e contributi all’inserimento lavorativo.",
-        ha="center",
-        fontsize=9.2,
-        color="#777777",
+    add_footer(
+        fig,
+        "Fonte: elaborazione su dati Istat, Interventi e servizi sociali dei Comuni singoli o associati.",
+        "Indicatore composito: attività ricreative/sociali/culturali, centri di aggregazione, centri estivi e inserimento lavorativo.",
     )
 
-    plt.subplots_adjust(left=0.23, right=0.96, top=0.82, bottom=0.14)
-    OUTPUTS.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUTPUTS / "benchmark_opportunita_under18_2023.png", dpi=300, bbox_inches="tight")
-    fig.savefig(OUTPUTS / "benchmark_opportunita_under18_2023.svg", bbox_inches="tight")
+    save_public_figure(fig, OUTPUTS / "benchmark_opportunita_under18_2023")
     plt.close(fig)
 
 
